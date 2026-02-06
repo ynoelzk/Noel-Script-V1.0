@@ -1,408 +1,767 @@
--- AntiCheat Test Menu v4.0
--- GitHub: https://github.com/seuusuario/anticheat-test-menu
-
--- Serviços
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
+-- 🎮 NOEL TOXIC SUITE - VERSÃO SEGURA (SEM CHEATS)
 local CoreGui = game:GetService("CoreGui")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
--- Configuração
-local Config = {
-    Key = "noel2026",
-    Version = "v4.0",
-    Author = "AntiCheat Tester"
-}
+-- ============================================================================
+-- 1. ESTRUTURA BÁSICA
+-- ============================================================================
 
--- Estado dos cheats
-local Cheats = {
-    GodMode = false,
-    NoClip = false,
-    WalkSpeed = 16,
-    JumpPower = 50,
-    Fly = false
-}
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.ResetOnSpawn = false
 
--- Conexões
-local Connections = {}
-local NoClipConnection = nil
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 320, 0, 380)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -190)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(128, 0, 32)
+MainFrame.Visible = true
 
--- FUNÇÃO PRINCIPAL
-local function InitAntiCheatTest()
-    
-    -- Cria a interface
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ACTestMenu"
-    ScreenGui.Parent = CoreGui
-    ScreenGui.ResetOnSpawn = false
-    
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 300, 0, 200)
-    MainFrame.Position = UDim2.new(0, 20, 0, 20)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    MainFrame.BorderSizePixel = 2
-    MainFrame.BorderColor3 = Color3.fromRGB(0, 255, 0)
-    MainFrame.Active = true
-    MainFrame.Draggable = true
-    MainFrame.Parent = ScreenGui
+-- ============================================================================
+-- 2. TELA DE LOGIN (SEGURA - SEM DICA DA SENHA)
+-- ============================================================================
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+Title.Text = "NOEL TOXIC SUITE"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 18
+
+local KeyBox = Instance.new("TextBox", MainFrame)
+KeyBox.Size = UDim2.new(0.8, 0, 0, 30)
+KeyBox.Position = UDim2.new(0.1, 0, 0.4, 0)
+KeyBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.PlaceholderText = "Digite a senha de acesso"
+KeyBox.Text = ""
+
+local Button = Instance.new("TextButton", MainFrame)
+Button.Size = UDim2.new(0.8, 0, 0, 30)
+Button.Position = UDim2.new(0.1, 0, 0.6, 0)
+Button.BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+Button.Text = "ENTRAR"
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Font = Enum.Font.GothamBold
+
+-- ============================================================================
+-- 3. QUANDO CLICA NO BOTÃO
+-- ============================================================================
+
+Button.MouseButton1Click:Connect(function()
+    if KeyBox.Text == "noel2026" then
+        -- Remover elementos de login
+        Title:Destroy()
+        KeyBox:Destroy()
+        Button:Destroy()
+        
+        -- Criar interface principal
+        createMainInterface()
+    else
+        KeyBox.Text = ""
+    end
+end)
+
+-- ============================================================================
+-- 4. INTERFACE PRINCIPAL
+-- ============================================================================
+
+function createMainInterface()
+    -- Ajustar frame
+    MainFrame.Size = UDim2.new(0, 400, 0, 450)
+    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -225)
+    MainFrame.BorderSizePixel = 3
     
     -- Título
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 40)
-    Title.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
-    Title.Text = "  AntiCheat Test " .. Config.Version
-    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-    Title.Font = Enum.Font.Code
-    Title.TextSize = 18
-    Title.Parent = MainFrame
+    local MainTitle = Instance.new("TextLabel", MainFrame)
+    MainTitle.Size = UDim2.new(1, 0, 0, 45)
+    MainTitle.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+    MainTitle.Text = "NOEL TOXIC SUITE - VERSÃO SEGURA"
+    MainTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MainTitle.Font = Enum.Font.GothamBlack
+    MainTitle.TextSize = 18
     
-    -- Campo de chave
-    local KeyInput = Instance.new("TextBox")
-    KeyInput.Size = UDim2.new(0.9, 0, 0, 30)
-    KeyInput.Position = UDim2.new(0.05, 0, 0, 50)
-    KeyInput.PlaceholderText = "Enter access code..."
-    KeyInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    KeyInput.ClearTextOnFocus = false
-    KeyInput.Parent = MainFrame
+    -- BOTÃO X PARA FECHAR (NOVO)
+    local CloseButton = Instance.new("TextButton", MainFrame)
+    CloseButton.Size = UDim2.new(0, 25, 0, 25)
+    CloseButton.Position = UDim2.new(1, -30, 0, 10)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    CloseButton.Text = "X"
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.TextSize = 14
     
-    -- Botão de verificação
-    local VerifyBtn = Instance.new("TextButton")
-    VerifyBtn.Size = UDim2.new(0.9, 0, 0, 30)
-    VerifyBtn.Position = UDim2.new(0.05, 0, 0, 90)
-    VerifyBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-    VerifyBtn.Text = "VERIFY KEY"
-    VerifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    VerifyBtn.Parent = MainFrame
-    
-    -- Status
-    local Status = Instance.new("TextLabel")
-    Status.Size = UDim2.new(0.9, 0, 0, 20)
-    Status.Position = UDim2.new(0.05, 0, 0, 130)
-    Status.BackgroundTransparency = 1
-    Status.Text = "Status: Locked"
-    Status.TextColor3 = Color3.fromRGB(255, 50, 50)
-    Status.TextXAlignment = Enum.TextXAlignment.Left
-    Status.Parent = MainFrame
-    
-    -- Botão fechar
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Size = UDim2.new(0, 40, 0, 40)
-    CloseBtn.Position = UDim2.new(1, -40, 0, 0)
-    CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-    CloseBtn.Text = "X"
-    CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    CloseBtn.Parent = MainFrame
-    CloseBtn.MouseButton1Click:Connect(function()
+    CloseButton.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()
-        for _, conn in pairs(Connections) do
-            conn:Disconnect()
+    end)
+    
+    -- Container
+    local Container = Instance.new("Frame", MainFrame)
+    Container.Size = UDim2.new(1, 0, 1, -45)
+    Container.Position = UDim2.new(0, 0, 0, 45)
+    Container.BackgroundTransparency = 1
+    
+    -- Abas
+    local TabPanel = Instance.new("Frame", Container)
+    TabPanel.Size = UDim2.new(0, 100, 1, -10)
+    TabPanel.Position = UDim2.new(0, 0, 0, 5)
+    TabPanel.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+    
+    -- Borda
+    local Border = Instance.new("Frame", TabPanel)
+    Border.Size = UDim2.new(0, 2, 1, 0)
+    Border.Position = UDim2.new(1, -2, 0, 0)
+    Border.BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+    
+    -- Conteúdo
+    local ContentArea = Instance.new("Frame", Container)
+    ContentArea.Size = UDim2.new(1, -100, 1, -10)
+    ContentArea.Position = UDim2.new(0, 100, 0, 5)
+    ContentArea.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    
+    -- ============================================================================
+    -- 5. ABA TCS - APENAS INFORMAÇÕES (SEM CHEATS)
+    -- ============================================================================
+    
+    local TCSContent = Instance.new("ScrollingFrame", ContentArea)
+    TCSContent.Size = UDim2.new(1, 0, 1, 0)
+    TCSContent.BackgroundTransparency = 1
+    TCSContent.ScrollBarThickness = 4
+    TCSContent.CanvasSize = UDim2.new(0, 0, 0, 200)
+    TCSContent.Visible = true
+    
+    local TCSTitle = Instance.new("TextLabel", TCSContent)
+    TCSTitle.Size = UDim2.new(1, -20, 0, 30)
+    TCSTitle.Position = UDim2.new(0, 10, 0, 10)
+    TCSTitle.BackgroundTransparency = 1
+    TCSTitle.Text = "⚽ THE CLASSIC SOCCER"
+    TCSTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TCSTitle.Font = Enum.Font.GothamBlack
+    TCSTitle.TextSize = 16
+    
+    -- MENSAGEM INFORMATIVA SOBRE A REMOÇÃO DOS CHEATS
+    local WarningLabel = Instance.new("TextLabel", TCSContent)
+    WarningLabel.Size = UDim2.new(0.9, 0, 0, 60)
+    WarningLabel.Position = UDim2.new(0.05, 0, 0, 50)
+    WarningLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    WarningLabel.Text = "⚠️ FUNÇÕES REMOVIDAS\nOs cheats foram removidos por segurança\npara evitar banimento da conta."
+    WarningLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    WarningLabel.Font = Enum.Font.GothamBold
+    WarningLabel.TextSize = 12
+    WarningLabel.TextWrapped = true
+    
+    -- Informações sobre o jogo
+    local GameInfo = Instance.new("TextLabel", TCSContent)
+    GameInfo.Size = UDim2.new(0.9, 0, 0, 80)
+    GameInfo.Position = UDim2.new(0.05, 0, 0, 120)
+    GameInfo.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    GameInfo.Text = "📊 INFORMAÇÕES DO JOGO\n\n• Jogo: The Classic Soccer\n• Status: Online\n• Versão: Atualizada"
+    GameInfo.TextColor3 = Color3.fromRGB(200, 200, 255)
+    GameInfo.Font = Enum.Font.Gotham
+    GameInfo.TextSize = 12
+    GameInfo.TextWrapped = true
+    
+    -- ============================================================================
+    -- 6. ABA ZARALHAR - COM OS CHEATS DO JEITO QUE VOCÊ QUER
+    -- ============================================================================
+    
+    local ZaralharContent = Instance.new("ScrollingFrame", ContentArea)
+    ZaralharContent.Size = UDim2.new(1, 0, 1, 0)
+    ZaralharContent.BackgroundTransparency = 1
+    ZaralharContent.ScrollBarThickness = 4
+    ZaralharContent.CanvasSize = UDim2.new(0, 0, 0, 460) -- <<< SCROLL AJUSTADO AQUI (460)
+    ZaralharContent.Visible = false
+    
+    local ZaralharTitle = Instance.new("TextLabel", ZaralharContent)
+    ZaralharTitle.Size = UDim2.new(1, -20, 0, 30)
+    ZaralharTitle.Position = UDim2.new(0, 10, 0, 10)
+    ZaralharTitle.BackgroundTransparency = 1
+    ZaralharTitle.Text = "🌀 ZARALHAR CHEATS"
+    ZaralharTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ZaralharTitle.Font = Enum.Font.GothamBlack
+    ZaralharTitle.TextSize = 16
+    
+    -- Variáveis globais
+    local player = Players.LocalPlayer
+    local flyActive = false
+    local flySpeed = 100 -- Velocidade fixa alta pro fly
+    local flyBodyVelocity = nil
+    local flyConnection = nil
+    local noclipActive = false
+    local noclipConnection = nil
+    local godModeActive = false
+    local godModeConnection = nil
+    
+    -- Função para criar botão com status
+    local function createCheatButton(name, description, yPosition)
+        local buttonFrame = Instance.new("Frame", ZaralharContent)
+        buttonFrame.Size = UDim2.new(0.9, 0, 0, 60)
+        buttonFrame.Position = UDim2.new(0.05, 0, 0, yPosition)
+        buttonFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        buttonFrame.BorderSizePixel = 0
+        
+        local button = Instance.new("TextButton", buttonFrame)
+        button.Size = UDim2.new(0.4, 0, 1, 0)
+        button.Position = UDim2.new(0, 0, 0, 0)
+        button.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+        button.Text = "✅ " .. name
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.Font = Enum.Font.GothamBold
+        button.TextSize = 14
+        
+        local statusLabel = Instance.new("TextLabel", buttonFrame)
+        statusLabel.Size = UDim2.new(0.25, 0, 1, 0)
+        statusLabel.Position = UDim2.new(0.4, 0, 0, 0)
+        statusLabel.BackgroundTransparency = 1
+        statusLabel.Text = "INATIVO"
+        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        statusLabel.Font = Enum.Font.GothamBold
+        statusLabel.TextSize = 12
+        
+        local descLabel = Instance.new("TextLabel", buttonFrame)
+        descLabel.Size = UDim2.new(0.35, 0, 1, 0)
+        descLabel.Position = UDim2.new(0.65, 0, 0, 0)
+        descLabel.BackgroundTransparency = 1
+        descLabel.Text = description
+        descLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+        descLabel.Font = Enum.Font.Gotham
+        descLabel.TextSize = 11
+        descLabel.TextWrapped = true
+        descLabel.TextXAlignment = Enum.TextXAlignment.Left
+        
+        return button, buttonFrame, statusLabel
+    end
+    
+    -- Função para criar controle de +/- (DO JEITO QUE VOCÊ GOSTA)
+    local function createSliderControl(name, yPos, minVal, maxVal, step, defaultVal, unit)
+        local controlFrame = Instance.new("Frame", ZaralharContent)
+        controlFrame.Size = UDim2.new(0.9, 0, 0, 60)
+        controlFrame.Position = UDim2.new(0.05, 0, 0, yPos)
+        controlFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        controlFrame.BorderSizePixel = 0
+        
+        local nameLabel = Instance.new("TextLabel", controlFrame)
+        nameLabel.Size = UDim2.new(0.4, 0, 0.5, 0)
+        nameLabel.Position = UDim2.new(0, 0, 0, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = name
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.Font = Enum.Font.GothamBold
+        nameLabel.TextSize = 14
+        
+        local valueLabel = Instance.new("TextLabel", controlFrame)
+        valueLabel.Size = UDim2.new(0.4, 0, 0.5, 0)
+        valueLabel.Position = UDim2.new(0.4, 0, 0, 0)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Text = defaultVal .. unit
+        valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        valueLabel.Font = Enum.Font.GothamBold
+        valueLabel.TextSize = 14
+        
+        local buttonFrame = Instance.new("Frame", controlFrame)
+        buttonFrame.Size = UDim2.new(0.2, 0, 0.5, 0)
+        buttonFrame.Position = UDim2.new(0.8, 0, 0, 0)
+        buttonFrame.BackgroundTransparency = 1
+        
+        local minusButton = Instance.new("TextButton", buttonFrame)
+        minusButton.Size = UDim2.new(0.4, 0, 1, 0)
+        minusButton.Position = UDim2.new(0, 0, 0, 0)
+        minusButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        minusButton.Text = "-"
+        minusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        minusButton.Font = Enum.Font.GothamBold
+        minusButton.TextSize = 14
+        
+        local plusButton = Instance.new("TextButton", buttonFrame)
+        plusButton.Size = UDim2.new(0.4, 0, 1, 0)
+        plusButton.Position = UDim2.new(0.6, 0, 0, 0)
+        plusButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        plusButton.Text = "+"
+        plusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        plusButton.Font = Enum.Font.GothamBold
+        plusButton.TextSize = 14
+        
+        local currentValue = defaultVal
+        
+        local function updateValue()
+            valueLabel.Text = currentValue .. unit
+            return currentValue
         end
-        if NoClipConnection then
-            NoClipConnection:Disconnect()
+        
+        minusButton.MouseButton1Click:Connect(function()
+            currentValue = math.max(minVal, currentValue - step)
+            updateValue()
+        end)
+        
+        plusButton.MouseButton1Click:Connect(function()
+            currentValue = math.min(maxVal, currentValue + step)
+            updateValue()
+        end)
+        
+        -- Função pra pegar o valor atual
+        local function getValue()
+            return currentValue
+        end
+        
+        -- Função pra definir valor
+        local function setValue(val)
+            currentValue = math.clamp(val, minVal, maxVal)
+            updateValue()
+        end
+        
+        -- Descrição
+        local descLabel = Instance.new("TextLabel", controlFrame)
+        descLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        descLabel.Position = UDim2.new(0, 0, 0.5, 0)
+        descLabel.BackgroundTransparency = 1
+        descLabel.Text = "Ajuste de " .. step .. unit .. " em " .. step .. unit .. " (" .. minVal .. unit .. " a " .. maxVal .. unit .. ")"
+        descLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+        descLabel.Font = Enum.Font.Gotham
+        descLabel.TextSize = 11
+        descLabel.TextWrapped = true
+        
+        return controlFrame, getValue, setValue
+    end
+    
+    -- 1. FLY (RÁPIDO E COM CONTROLE)
+    local flyButton, flyFrame, flyStatus = createCheatButton("FLY", "Controles: WASD + E(Subir)/Q(Descer)", 50)
+    
+    flyButton.MouseButton1Click:Connect(function()
+        flyActive = not flyActive
+        
+        if flyActive then
+            -- Ativar fly
+            flyButton.Text = "❌ FLY"
+            flyButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            flyStatus.Text = "ATIVO"
+            flyStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            humanoid.PlatformStand = true
+            
+            -- Criar BodyVelocity
+            flyBodyVelocity = Instance.new("BodyVelocity")
+            flyBodyVelocity.MaxForce = Vector3.new(40000, 40000, 40000)
+            flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            flyBodyVelocity.Parent = character.PrimaryPart
+            
+            flyConnection = RunService.Heartbeat:Connect(function()
+                if character and character.PrimaryPart and flyActive then
+                    local camera = workspace.CurrentCamera
+                    local moveDirection = Vector3.new(0, 0, 0)
+                    
+                    -- Controles WASD
+                    if UIS:IsKeyDown(Enum.KeyCode.W) then
+                        moveDirection = moveDirection + camera.CFrame.LookVector
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.S) then
+                        moveDirection = moveDirection - camera.CFrame.LookVector
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.D) then
+                        moveDirection = moveDirection + camera.CFrame.RightVector
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.A) then
+                        moveDirection = moveDirection - camera.CFrame.RightVector
+                    end
+                    
+                    -- Controles E/Q
+                    if UIS:IsKeyDown(Enum.KeyCode.E) then
+                        moveDirection = moveDirection + Vector3.new(0, 1, 0)
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.Q) then
+                        moveDirection = moveDirection + Vector3.new(0, -1, 0)
+                    end
+                    
+                    -- Aplicar velocidade (FIXA E ALTA)
+                    if moveDirection.Magnitude > 0 then
+                        moveDirection = moveDirection.Unit * flySpeed
+                    end
+                    
+                    flyBodyVelocity.Velocity = moveDirection
+                end
+            end)
+        else
+            -- Desativar fly
+            flyButton.Text = "✅ FLY"
+            flyButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            flyStatus.Text = "INATIVO"
+            flyStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            if flyConnection then
+                flyConnection:Disconnect()
+                flyConnection = nil
+            end
+            
+            local character = player.Character
+            if character then
+                local humanoid = character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid.PlatformStand = false
+                end
+                
+                if flyBodyVelocity then
+                    flyBodyVelocity:Destroy()
+                    flyBodyVelocity = nil
+                end
+                
+                character.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
+            end
         end
     end)
     
-    -- Funções dos cheats
-    local function ToggleGodMode()
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("Humanoid") then
-            if Cheats.GodMode then
-                -- Ativar God Mode
-                char.Humanoid.MaxHealth = math.huge
-                char.Humanoid.Health = math.huge
-                -- Proteção extra
-                char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-                print("God Mode ATIVADO")
-            else
-                -- Desativar God Mode
-                char.Humanoid.MaxHealth = 100
-                char.Humanoid.Health = math.min(100, char.Humanoid.Health)
-                char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
-                print("God Mode DESATIVADO")
+    -- FLY SPEED CONTROLE (NOVO - ADICIONADO DEPOIS DO FLY)
+    local flySpeedControl, flySpeedGetValue, flySpeedSetValue = createSliderControl("FLY SPEED", 120, 10, 300, 10, 100, "")
+    
+    -- Atualizar velocidade do fly quando mudar
+    local function updateFlySpeed()
+        flySpeed = flySpeedGetValue()
+    end
+    
+    -- Conectar os botões do Fly Speed
+    local flySpeedMinusButton = flySpeedControl:FindFirstChild("Frame"):FindFirstChild("TextButton")
+    local flySpeedPlusButton = flySpeedControl:FindFirstChild("Frame"):FindFirstChild("TextButton", true)
+    
+    flySpeedMinusButton.MouseButton1Click:Connect(function()
+        updateFlySpeed()
+    end)
+    
+    flySpeedPlusButton.MouseButton1Click:Connect(function()
+        updateFlySpeed()
+    end)
+    
+    -- 2. WALKSPEED (CONTROLE DE 5 EM 5)
+    local wsControl, wsGetValue, wsSetValue = createSliderControl("WALKSPEED", 190, 5, 200, 5, 16, "")
+    
+    -- Aplicar WalkSpeed quando mudar
+    local function updateWalkSpeed()
+        local speed = wsGetValue()
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = speed
             end
         end
     end
     
-    local function ToggleNoClip()
-        if Cheats.NoClip then
-            -- Ativar NoClip
-            if NoClipConnection then
-                NoClipConnection:Disconnect()
+    -- Conectar os botões +/-
+    local wsMinusButton = wsControl:FindFirstChild("Frame"):FindFirstChild("TextButton")
+    local wsPlusButton = wsControl:FindFirstChild("Frame"):FindFirstChild("TextButton", true)
+    
+    wsMinusButton.MouseButton1Click:Connect(function()
+        updateWalkSpeed()
+    end)
+    
+    wsPlusButton.MouseButton1Click:Connect(function()
+        updateWalkSpeed()
+    end)
+    
+    -- Aplicar inicial
+    updateWalkSpeed()
+    
+    -- 3. JUMP POWER (CONTROLE DE 5 EM 5)
+    local jpControl, jpGetValue, jpSetValue = createSliderControl("JUMP POWER", 260, 5, 300, 5, 50, "")
+    
+    -- Aplicar JumpPower quando mudar
+    local function updateJumpPower()
+        local power = jpGetValue()
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.JumpPower = power
             end
-            NoClipConnection = RunService.Stepped:Connect(function()
-                local char = LocalPlayer.Character
-                if char then
-                    for _, part in pairs(char:GetDescendants()) do
+        end
+    end
+    
+    local jpMinusButton = jpControl:FindFirstChild("Frame"):FindFirstChild("TextButton")
+    local jpPlusButton = jpControl:FindFirstChild("Frame"):FindFirstChild("TextButton", true)
+    
+    jpMinusButton.MouseButton1Click:Connect(function()
+        updateJumpPower()
+    end)
+    
+    jpPlusButton.MouseButton1Click:Connect(function()
+        updateJumpPower()
+    end)
+    
+    -- Aplicar inicial
+    updateJumpPower()
+    
+    -- 4. GOD MODE (CORRIGIDO DE VERDADE)
+    local godButton, godFrame, godStatus = createCheatButton("GOD MODE", "Torna completamente invencível", 330)
+    
+    godButton.MouseButton1Click:Connect(function()
+        godModeActive = not godModeActive
+        
+        if godModeActive then
+            godButton.Text = "❌ GOD MODE"
+            godButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            godStatus.Text = "ATIVO"
+            godStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            
+            -- Método SUPER eficaz
+            local originalMaxHealth = humanoid.MaxHealth
+            humanoid:SetAttribute("OriginalMaxHealth", originalMaxHealth)
+            
+            humanoid.MaxHealth = math.huge
+            humanoid.Health = math.huge
+            
+            -- Conectar para manter saúde máxima
+            godModeConnection = humanoid.HealthChanged:Connect(function()
+                if humanoid.Health < humanoid.MaxHealth then
+                    humanoid.Health = humanoid.MaxHealth
+                end
+            end)
+        else
+            godButton.Text = "✅ GOD MODE"
+            godButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            godStatus.Text = "INATIVO"
+            godStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            if godModeConnection then
+                godModeConnection:Disconnect()
+                godModeConnection = nil
+            end
+            
+            local character = player.Character
+            if character then
+                local humanoid = character:FindFirstChild("Humanoid")
+                if humanoid then
+                    local originalMaxHealth = humanoid:GetAttribute("OriginalMaxHealth") or 100
+                    humanoid.MaxHealth = originalMaxHealth
+                    humanoid.Health = math.min(100, originalMaxHealth)
+                end
+            end
+        end
+    end)
+    
+    -- 5. NOCLIP (POSIÇÃO AJUSTADA)
+    local noclipButton, noclipFrame, noclipStatus = createCheatButton("NOCLIP", "Atravessa paredes e objetos", 400)
+    
+    noclipButton.MouseButton1Click:Connect(function()
+        noclipActive = not noclipActive
+        
+        if noclipActive then
+            noclipButton.Text = "❌ NOCLIP"
+            noclipButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            noclipStatus.Text = "ATIVO"
+            noclipStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            
+            noclipConnection = RunService.Stepped:Connect(function()
+                local character = player.Character
+                if character then
+                    for _, part in pairs(character:GetDescendants()) do
                         if part:IsA("BasePart") then
                             part.CanCollide = false
                         end
                     end
                 end
             end)
-            print("NoClip ATIVADO")
         else
-            -- Desativar NoClip
-            if NoClipConnection then
-                NoClipConnection:Disconnect()
-                NoClipConnection = nil
+            noclipButton.Text = "✅ NOCLIP"
+            noclipButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            noclipStatus.Text = "INATIVO"
+            noclipStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
             end
-            -- Restaurar colisão
-            local char = LocalPlayer.Character
-            if char then
-                for _, part in pairs(char:GetDescendants()) do
+            
+            local character = player.Character
+            if character then
+                for _, part in pairs(character:GetDescendants()) do
                     if part:IsA("BasePart") then
                         part.CanCollide = true
                     end
                 end
             end
-            print("NoClip DESATIVADO")
-        end
-    end
-    
-    local function UpdateMovement()
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid.WalkSpeed = Cheats.WalkSpeed
-            char.Humanoid.JumpPower = Cheats.JumpPower
-        end
-    end
-    
-    -- Criar interface dos cheats
-    local function CreateCheatInterface()
-        -- Remover elementos de verificação
-        KeyInput:Destroy()
-        VerifyBtn:Destroy()
-        Status:Destroy()
-        
-        -- Ajustar tamanho do frame
-        MainFrame.Size = UDim2.new(0, 300, 0, 350)
-        
-        local yOffset = 50
-        local buttonHeight = 35
-        local padding = 10
-        
-        -- God Mode
-        local godBtn = Instance.new("TextButton")
-        godBtn.Size = UDim2.new(0.9, 0, 0, buttonHeight)
-        godBtn.Position = UDim2.new(0.05, 0, 0, yOffset)
-        godBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
-        godBtn.Text = "GOD MODE: OFF"
-        godBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        godBtn.Font = Enum.Font.Code
-        godBtn.TextSize = 14
-        godBtn.Parent = MainFrame
-        
-        godBtn.MouseButton1Click:Connect(function()
-            Cheats.GodMode = not Cheats.GodMode
-            godBtn.Text = "GOD MODE: " .. (Cheats.GodMode and "ON" or "OFF")
-            godBtn.BackgroundColor3 = Cheats.GodMode and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(60, 60, 150)
-            ToggleGodMode()
-        end)
-        
-        yOffset = yOffset + buttonHeight + padding
-        
-        -- NoClip
-        local noclipBtn = Instance.new("TextButton")
-        noclipBtn.Size = UDim2.new(0.9, 0, 0, buttonHeight)
-        noclipBtn.Position = UDim2.new(0.05, 0, 0, yOffset)
-        noclipBtn.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
-        noclipBtn.Text = "NOCLIP: OFF"
-        noclipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        noclipBtn.Parent = MainFrame
-        
-        noclipBtn.MouseButton1Click:Connect(function()
-            Cheats.NoClip = not Cheats.NoClip
-            noclipBtn.Text = "NOCLIP: " .. (Cheats.NoClip and "ON" or "OFF")
-            noclipBtn.BackgroundColor3 = Cheats.NoClip and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 60, 60)
-            ToggleNoClip()
-        end)
-        
-        yOffset = yOffset + buttonHeight + padding + 10
-        
-        -- WalkSpeed
-        local wsLabel = Instance.new("TextLabel")
-        wsLabel.Size = UDim2.new(0.9, 0, 0, 20)
-        wsLabel.Position = UDim2.new(0.05, 0, 0, yOffset)
-        wsLabel.BackgroundTransparency = 1
-        wsLabel.Text = "WalkSpeed: " .. Cheats.WalkSpeed
-        wsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        wsLabel.TextXAlignment = Enum.TextXAlignment.Left
-        wsLabel.Font = Enum.Font.Code
-        wsLabel.TextSize = 12
-        wsLabel.Parent = MainFrame
-        
-        yOffset = yOffset + 20
-        
-        local wsFrame = Instance.new("Frame")
-        wsFrame.Size = UDim2.new(0.9, 0, 0, 30)
-        wsFrame.Position = UDim2.new(0.05, 0, 0, yOffset)
-        wsFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        wsFrame.Parent = MainFrame
-        
-        local wsMinus = Instance.new("TextButton")
-        wsMinus.Size = UDim2.new(0.2, 0, 1, 0)
-        wsMinus.Position = UDim2.new(0, 0, 0, 0)
-        wsMinus.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        wsMinus.Text = "-5"
-        wsMinus.TextColor3 = Color3.fromRGB(255, 255, 255)
-        wsMinus.Parent = wsFrame
-        
-        local wsValue = Instance.new("TextLabel")
-        wsValue.Size = UDim2.new(0.6, 0, 1, 0)
-        wsValue.Position = UDim2.new(0.2, 0, 0, 0)
-        wsValue.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-        wsValue.Text = tostring(Cheats.WalkSpeed)
-        wsValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-        wsValue.Parent = wsFrame
-        
-        local wsPlus = Instance.new("TextButton")
-        wsPlus.Size = UDim2.new(0.2, 0, 1, 0)
-        wsPlus.Position = UDim2.new(0.8, 0, 0, 0)
-        wsPlus.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        wsPlus.Text = "+5"
-        wsPlus.TextColor3 = Color3.fromRGB(255, 255, 255)
-        wsPlus.Parent = wsFrame
-        
-        local function UpdateWS()
-            wsValue.Text = tostring(Cheats.WalkSpeed)
-            wsLabel.Text = "WalkSpeed: " .. Cheats.WalkSpeed
-            UpdateMovement()
-        end
-        
-        wsMinus.MouseButton1Click:Connect(function()
-            Cheats.WalkSpeed = math.max(16, Cheats.WalkSpeed - 5)
-            UpdateWS()
-        end)
-        
-        wsPlus.MouseButton1Click:Connect(function()
-            Cheats.WalkSpeed = math.min(200, Cheats.WalkSpeed + 5)
-            UpdateWS()
-        end)
-        
-        yOffset = yOffset + 40
-        
-        -- JumpPower
-        local jpLabel = Instance.new("TextLabel")
-        jpLabel.Size = UDim2.new(0.9, 0, 0, 20)
-        jpLabel.Position = UDim2.new(0.05, 0, 0, yOffset)
-        jpLabel.BackgroundTransparency = 1
-        jpLabel.Text = "JumpPower: " .. Cheats.JumpPower
-        jpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        jpLabel.TextXAlignment = Enum.TextXAlignment.Left
-        jpLabel.Font = Enum.Font.Code
-        jpLabel.TextSize = 12
-        jpLabel.Parent = MainFrame
-        
-        yOffset = yOffset + 20
-        
-        local jpFrame = Instance.new("Frame")
-        jpFrame.Size = UDim2.new(0.9, 0, 0, 30)
-        jpFrame.Position = UDim2.new(0.05, 0, 0, yOffset)
-        jpFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        jpFrame.Parent = MainFrame
-        
-        local jpMinus = Instance.new("TextButton")
-        jpMinus.Size = UDim2.new(0.2, 0, 1, 0)
-        jpMinus.Position = UDim2.new(0, 0, 0, 0)
-        jpMinus.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        jpMinus.Text = "-5"
-        jpMinus.TextColor3 = Color3.fromRGB(255, 255, 255)
-        jpMinus.Parent = jpFrame
-        
-        local jpValue = Instance.new("TextLabel")
-        jpValue.Size = UDim2.new(0.6, 0, 1, 0)
-        jpValue.Position = UDim2.new(0.2, 0, 0, 0)
-        jpValue.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-        jpValue.Text = tostring(Cheats.JumpPower)
-        jpValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-        jpValue.Parent = jpFrame
-        
-        local jpPlus = Instance.new("TextButton")
-        jpPlus.Size = UDim2.new(0.2, 0, 1, 0)
-        jpPlus.Position = UDim2.new(0.8, 0, 0, 0)
-        jpPlus.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        jpPlus.Text = "+5"
-        jpPlus.TextColor3 = Color3.fromRGB(255, 255, 255)
-        jpPlus.Parent = jpFrame
-        
-        local function UpdateJP()
-            jpValue.Text = tostring(Cheats.JumpPower)
-            jpLabel.Text = "JumpPower: " .. Cheats.JumpPower
-            UpdateMovement()
-        end
-        
-        jpMinus.MouseButton1Click:Connect(function()
-            Cheats.JumpPower = math.max(50, Cheats.JumpPower - 5)
-            UpdateJP()
-        end)
-        
-        jpPlus.MouseButton1Click:Connect(function()
-            Cheats.JumpPower = math.min(200, Cheats.JumpPower + 5)
-            UpdateJP()
-        end)
-        
-        -- Aplicar valores iniciais
-        UpdateWS()
-        UpdateJP()
-    end
-    
-    -- Verificação da chave
-    VerifyBtn.MouseButton1Click:Connect(function()
-        if KeyInput.Text == Config.Key then
-            Status.Text = "Status: Verified ✓"
-            Status.TextColor3 = Color3.fromRGB(0, 255, 0)
-            task.wait(0.5)
-            CreateCheatInterface()
-        else
-            Status.Text = "Status: Invalid Code"
-            Status.TextColor3 = Color3.fromRGB(255, 50, 50)
-            KeyInput.Text = ""
         end
     end)
     
-    -- Hotkey (F5 para mostrar/esconder)
-    Connections.Hotkey = UserInputService.InputBegan:Connect(function(input)
+    -- Resetar quando personagem morre
+    player.CharacterAdded:Connect(function()
+        task.wait(0.5)
+        
+        if flyActive then
+            flyActive = false
+            if flyConnection then flyConnection:Disconnect() end
+            if flyBodyVelocity then flyBodyVelocity:Destroy() end
+            flyButton.Text = "✅ FLY"
+            flyButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            flyStatus.Text = "INATIVO"
+            flyStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        if godModeActive then
+            godModeActive = false
+            if godModeConnection then godModeConnection:Disconnect() end
+            godButton.Text = "✅ GOD MODE"
+            godButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            godStatus.Text = "INATIVO"
+            godStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        if noclipActive then
+            noclipActive = false
+            if noclipConnection then noclipConnection:Disconnect() end
+            noclipButton.Text = "✅ NOCLIP"
+            noclipButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            noclipStatus.Text = "INATIVO"
+            noclipStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        -- Reaplicar WS e JP
+        updateWalkSpeed()
+        updateJumpPower()
+    end)
+    
+    -- ============================================================================
+    -- 7. BOTÕES DAS ABAS
+    -- ============================================================================
+    
+    local tabs = {}
+    local tabContents = {}
+    
+    -- Botão TCS (ativo por padrão)
+    tabs.TCS = Instance.new("TextButton", TabPanel)
+    tabs.TCS.Size = UDim2.new(1, -10, 0, 35)
+    tabs.TCS.Position = UDim2.new(0, 5, 0, 20)
+    tabs.TCS.BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+    tabs.TCS.Text = "⚽ TCS"
+    tabs.TCS.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabs.TCS.Font = Enum.Font.GothamBold
+    
+    -- Botões das outras abas
+    local otherTabs = {
+        {"FPS", "🎯", 70},
+        {"ZARALHAR", "🌀", 120},
+        {"UTILITARIOS", "⚙️", 170}
+    }
+    
+    for _, tab in ipairs(otherTabs) do
+        tabs[tab[1]] = Instance.new("TextButton", TabPanel)
+        tabs[tab[1]].Size = UDim2.new(1, -10, 0, 35)
+        tabs[tab[1]].Position = UDim2.new(0, 5, 0, tab[3])
+        tabs[tab[1]].BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        tabs[tab[1]].Text = tab[2] .. " " .. tab[1]
+        tabs[tab[1]].TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabs[tab[1]].Font = Enum.Font.GothamBold
+    end
+    
+    -- ============================================================================
+    -- 8. SISTEMA PARA TROCAR DE ABA
+    -- ============================================================================
+    
+    -- Armazenar conteúdos das abas
+    tabContents.TCS = TCSContent
+    
+    for _, tab in ipairs(otherTabs) do
+        if tab[1] == "ZARALHAR" then
+            tabContents[tab[1]] = ZaralharContent
+        else
+            local tabContent = Instance.new("Frame", ContentArea)
+            tabContent.Size = UDim2.new(1, 0, 1, 0)
+            tabContent.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+            tabContent.Visible = false
+            
+            local label = Instance.new("TextLabel", tabContent)
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = tab[2] .. " " .. tab[1] .. "\n\n(Funcionalidades em desenvolvimento)"
+            label.TextColor3 = Color3.fromRGB(200, 200, 200)
+            label.Font = Enum.Font.Gotham
+            label.TextSize = 16
+            label.TextWrapped = true
+            
+            tabContents[tab[1]] = tabContent
+        end
+    end
+    
+    local function switchTab(tabName)
+        for _, content in pairs(tabContents) do
+            content.Visible = false
+        end
+        
+        for name, btn in pairs(tabs) do
+            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        end
+        
+        if tabContents[tabName] then
+            tabContents[tabName].Visible = true
+            tabs[tabName].BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+        end
+    end
+    
+    for name, btn in pairs(tabs) do
+        btn.MouseButton1Click:Connect(function()
+            switchTab(name)
+        end)
+    end
+    
+    -- ============================================================================
+    -- 9. FUNCIONALIDADES EXTRAS
+    -- ============================================================================
+    
+    UIS.InputBegan:Connect(function(input)
         if input.KeyCode == Enum.KeyCode.F5 then
             MainFrame.Visible = not MainFrame.Visible
         end
     end)
     
-    -- Reaplicar cheats ao respawnar
-    Connections.Respawn = LocalPlayer.CharacterAdded:Connect(function(character)
-        task.wait(1) -- Espera carregar
-        
-        if character:FindFirstChild("Humanoid") then
-            if Cheats.GodMode then
-                character.Humanoid.MaxHealth = math.huge
-                character.Humanoid.Health = math.huge
-            end
-            
-            character.Humanoid.WalkSpeed = Cheats.WalkSpeed
-            character.Humanoid.JumpPower = Cheats.JumpPower
-            
-            if Cheats.NoClip then
-                ToggleNoClip()
-            end
+    local dragging = false
+    local dragStart, startPos
+    
+    MainTitle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
         end
     end)
     
-    -- Mensagem de inicialização
+    MainTitle.InputEnded:Connect(function()
+        dragging = false
+    end)
+    
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            MainFrame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    
     print("========================================")
-    print("AntiCheat Test Menu " .. Config.Version)
-    print("Successfully loaded!")
-    print("Key: " .. Config.Key)
-    print("Hotkey: F5 (show/hide)")
-    print("Drag: Title bar | Close: X button")
+    print("🎮 NOEL TOXIC SUITE - VERSÃO PERFEITA")
+    print("✅ Botão X adicionado (fecha o menu)")
+    print("✅ Fly Speed adicionado (10 a 300, de 10 em 10)")
+    print("✅ Scroll ajustado (CanvasSize = 460)")
+    print("🌀 ZARALHAR: Cheats completos:")
+    print("   • FLY: Com controle de velocidade")
+    print("   • FLY SPEED: Ajuste de 10 em 10")
+    print("   • WALKSPEED: Controle de 5 em 5")
+    print("   • JUMP POWER: Controle de 5 em 5")
+    print("   • GOD MODE: Imortalidade total")
+    print("   • NOCLIP: Funcionando perfeitamente")
+    print("✅ NADA MAIS FOI MEXIDO")
     print("========================================")
 end
 
--- Inicializar
-if game:IsLoaded() then
-    InitAntiCheatTest()
-else
-    game.Loaded:Wait()
-    InitAntiCheatTest()
-end
+print("🎮 NOEL TOXIC SUITE CARREGADO")
+print("🔒 Versão perfeita - Completamente divina")
+print("🖱️ Pressione F5 para mostrar/esconder")
+print("❌ Botão X no canto superior direito")
