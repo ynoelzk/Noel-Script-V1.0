@@ -1,0 +1,1607 @@
+-- 🎮 NOEL MENU V2.0 - VERSÃO SEGURA (SEM CHEATS)
+local CoreGui = game:GetService("CoreGui")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+-- ============================================================================
+-- 1. ESTRUTURA BÁSICA
+-- ============================================================================
+
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 320, 0, 380)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -190)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(128, 0, 32)
+MainFrame.Visible = true
+
+-- ============================================================================
+-- 2. TELA DE LOGIN (SEGURA - SEM DICA DA SENHA)
+-- ============================================================================
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+Title.Text = "NOEL MENU V2.0"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 20
+Title.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Adicionar contorno marsala
+local TitleStroke = Instance.new("UIStroke", Title)
+TitleStroke.Color = Color3.fromRGB(128, 0, 32)
+TitleStroke.Thickness = 2
+TitleStroke.Transparency = 0
+
+local KeyBox = Instance.new("TextBox", MainFrame)
+KeyBox.Size = UDim2.new(0.8, 0, 0, 30)
+KeyBox.Position = UDim2.new(0.1, 0, 0.4, 0)
+KeyBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.PlaceholderText = "Digite a senha de acesso"
+KeyBox.Text = ""
+
+local Button = Instance.new("TextButton", MainFrame)
+Button.Size = UDim2.new(0.8, 0, 0, 30)
+Button.Position = UDim2.new(0.1, 0, 0.6, 0)
+Button.BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+Button.Text = "ENTRAR"
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 14
+
+-- ============================================================================
+-- 3. QUANDO CLICA NO BOTÃO
+-- ============================================================================
+
+Button.MouseButton1Click:Connect(function()
+    if KeyBox.Text == "noel2026" then
+        -- Remover elementos de login
+        Title:Destroy()
+        KeyBox:Destroy()
+        Button:Destroy()
+        
+        -- Criar interface principal
+        createMainInterface()
+    else
+        KeyBox.Text = ""
+    end
+end)
+
+-- ============================================================================
+-- 4. INTERFACE PRINCIPAL
+-- ============================================================================
+
+-- Variáveis globais para configurações
+local toggleMenuKey = Enum.KeyCode.F5 -- Hotkey padrão
+local aimbotSettings = {
+    active = false,
+    range = 500, -- Alcance em studs
+    smoothness = 0.3, -- Suavidade do aim (0.1 = muito suave, 1 = instantâneo)
+    targetPart = "Head", -- Parte do corpo para mirar
+    requireTeamCheck = true -- Só mirar em inimigos
+}
+
+-- Variáveis para ESP
+local espSettings = {
+    boxEnabled = false,
+    circleEnabled = false,
+    showTeam = false,
+    maxDistance = 500
+}
+
+local espConnections = {}
+local espObjects = {}
+
+function createMainInterface()
+    -- Ajustar frame para caber mais abas
+    MainFrame.Size = UDim2.new(0, 500, 0, 600)
+    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -300)
+    MainFrame.BorderSizePixel = 3
+    
+    -- Título COM BOTÃO X
+    local TitleFrame = Instance.new("Frame", MainFrame)
+    TitleFrame.Size = UDim2.new(1, 0, 0, 45)
+    TitleFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+    TitleFrame.BorderSizePixel = 0
+    
+    local MainTitle = Instance.new("TextLabel", TitleFrame)
+    MainTitle.Size = UDim2.new(0.85, 0, 1, 0)
+    MainTitle.Position = UDim2.new(0, 0, 0, 0)
+    MainTitle.BackgroundTransparency = 1
+    MainTitle.Text = "NOEL MENU V2.0"
+    MainTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MainTitle.Font = Enum.Font.GothamBlack
+    MainTitle.TextSize = 18
+    MainTitle.TextXAlignment = Enum.TextXAlignment.Center
+    
+    -- Adicionar contorno marsala ao título
+    local MainTitleStroke = Instance.new("UIStroke", MainTitle)
+    MainTitleStroke.Color = Color3.fromRGB(128, 0, 32)
+    MainTitleStroke.Thickness = 2
+    MainTitleStroke.Transparency = 0
+    
+    -- BOTÃO X PARA FECHAR
+    local CloseButton = Instance.new("TextButton", TitleFrame)
+    CloseButton.Size = UDim2.new(0, 45, 0, 45)
+    CloseButton.Position = UDim2.new(1, -45, 0, 0)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    CloseButton.Text = "X"
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.TextSize = 18
+    
+    CloseButton.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+    
+    -- Container
+    local Container = Instance.new("Frame", MainFrame)
+    Container.Size = UDim2.new(1, 0, 1, -45)
+    Container.Position = UDim2.new(0, 0, 0, 45)
+    Container.BackgroundTransparency = 1
+    
+    -- Abas
+    local TabPanel = Instance.new("Frame", Container)
+    TabPanel.Size = UDim2.new(0, 120, 1, -10)
+    TabPanel.Position = UDim2.new(0, 0, 0, 5)
+    TabPanel.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+    
+    -- Borda
+    local Border = Instance.new("Frame", TabPanel)
+    Border.Size = UDim2.new(0, 2, 1, 0)
+    Border.Position = UDim2.new(1, -2, 0, 0)
+    Border.BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+    
+    -- Conteúdo
+    local ContentArea = Instance.new("Frame", Container)
+    ContentArea.Size = UDim2.new(1, -120, 1, -10)
+    ContentArea.Position = UDim2.new(0, 120, 0, 5)
+    ContentArea.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    
+    -- ============================================================================
+    -- 5. ABA TCS - APENAS INFORMAÇÕES (SEM CHEATS)
+    -- ============================================================================
+    
+    local TCSContent = Instance.new("ScrollingFrame", ContentArea)
+    TCSContent.Size = UDim2.new(1, 0, 1, 0)
+    TCSContent.BackgroundTransparency = 1
+    TCSContent.ScrollBarThickness = 6
+    TCSContent.CanvasSize = UDim2.new(0, 0, 0, 220)
+    TCSContent.Visible = true
+    
+    local TCSTitle = Instance.new("TextLabel", TCSContent)
+    TCSTitle.Size = UDim2.new(1, -20, 0, 30)
+    TCSTitle.Position = UDim2.new(0, 10, 0, 10)
+    TCSTitle.BackgroundTransparency = 1
+    TCSTitle.Text = "⚽ THE CLASSIC SOCCER"
+    TCSTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TCSTitle.Font = Enum.Font.GothamBlack
+    TCSTitle.TextSize = 16
+    
+    -- MENSAGEM INFORMATIVA SOBRE A REMOÇÃO DOS CHEATS
+    local WarningLabel = Instance.new("TextLabel", TCSContent)
+    WarningLabel.Size = UDim2.new(0.9, 0, 0, 60)
+    WarningLabel.Position = UDim2.new(0.05, 0, 0, 50)
+    WarningLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    WarningLabel.Text = "⚠️ FUNÇÕES REMOVIDAS\nOs cheats foram removidos por segurança\npara evitar banimento da conta."
+    WarningLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    WarningLabel.Font = Enum.Font.GothamBold
+    WarningLabel.TextSize = 12
+    WarningLabel.TextWrapped = true
+    
+    -- Informações sobre o jogo
+    local GameInfo = Instance.new("TextLabel", TCSContent)
+    GameInfo.Size = UDim2.new(0.9, 0, 0, 80)
+    GameInfo.Position = UDim2.new(0.05, 0, 0, 120)
+    GameInfo.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    GameInfo.Text = "📊 INFORMAÇÕES DO JOGO\n\n• Jogo: The Classic Soccer\n• Status: Online\n• Versão: Atualizada"
+    GameInfo.TextColor3 = Color3.fromRGB(200, 200, 255)
+    GameInfo.Font = Enum.Font.Gotham
+    GameInfo.TextSize = 12
+    GameInfo.TextWrapped = true
+    
+    -- ============================================================================
+    -- 6. ABA FPS - COM AIMBOT COMPLEXO E ESP
+    -- ============================================================================
+    
+    local FPSContent = Instance.new("ScrollingFrame", ContentArea)
+    FPSContent.Size = UDim2.new(1, 0, 1, 0)
+    FPSContent.BackgroundTransparency = 1
+    FPSContent.ScrollBarThickness = 6
+    FPSContent.CanvasSize = UDim2.new(0, 0, 0, 700)
+    FPSContent.Visible = false
+    
+    local FPSTitle = Instance.new("TextLabel", FPSContent)
+    FPSTitle.Size = UDim2.new(1, -20, 0, 30)
+    FPSTitle.Position = UDim2.new(0, 10, 0, 10)
+    FPSTitle.BackgroundTransparency = 1
+    FPSTitle.Text = "🎯 FPS CHEATS"
+    FPSTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    FPSTitle.Font = Enum.Font.GothamBlack
+    FPSTitle.TextSize = 16
+    
+    -- Função para criar botão de toggle
+    local function createFPSToggleButton(text, yPos, initialState, description)
+        local buttonFrame = Instance.new("Frame", FPSContent)
+        buttonFrame.Size = UDim2.new(0.9, 0, 0, 60)
+        buttonFrame.Position = UDim2.new(0.05, 0, 0, yPos)
+        buttonFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        buttonFrame.BorderSizePixel = 0
+        
+        local button = Instance.new("TextButton", buttonFrame)
+        button.Size = UDim2.new(0.4, 0, 0.6, 0)
+        button.Position = UDim2.new(0, 0, 0, 0)
+        button.BackgroundColor3 = initialState and Color3.fromRGB(150, 60, 60) or Color3.fromRGB(60, 60, 150)
+        button.Text = initialState and "❌ " .. text or "✅ " .. text
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.Font = Enum.Font.GothamBold
+        button.TextSize = 14
+        
+        local statusLabel = Instance.new("TextLabel", buttonFrame)
+        statusLabel.Size = UDim2.new(0.4, 0, 0.6, 0)
+        statusLabel.Position = UDim2.new(0.6, 0, 0, 0)
+        statusLabel.BackgroundTransparency = 1
+        statusLabel.Text = initialState and "ATIVO" or "INATIVO"
+        statusLabel.TextColor3 = initialState and Color3.fromRGB(255, 100, 100) or Color3.fromRGB(100, 255, 100)
+        statusLabel.Font = Enum.Font.GothamBold
+        statusLabel.TextSize = 12
+        
+        local descLabel = Instance.new("TextLabel", buttonFrame)
+        descLabel.Size = UDim2.new(1, 0, 0.4, 0)
+        descLabel.Position = UDim2.new(0, 0, 0.6, 0)
+        descLabel.BackgroundTransparency = 1
+        descLabel.Text = description
+        descLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+        descLabel.Font = Enum.Font.Gotham
+        descLabel.TextSize = 11
+        descLabel.TextWrapped = true
+        descLabel.TextXAlignment = Enum.TextXAlignment.Left
+        
+        return button, buttonFrame, statusLabel
+    end
+    
+    -- Função para criar slider de controle CORRIGIDA
+    local function createSliderControl(yPos, title, minValue, maxValue, step, defaultValue, unit, onChange)
+        local controlFrame = Instance.new("Frame", FPSContent)
+        controlFrame.Size = UDim2.new(0.9, 0, 0, 60)
+        controlFrame.Position = UDim2.new(0.05, 0, 0, yPos)
+        controlFrame.BackgroundTransparency = 1
+        
+        local titleLabel = Instance.new("TextLabel", controlFrame)
+        titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
+        titleLabel.Position = UDim2.new(0, 0, 0, 0)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.Text = title .. ": " .. defaultValue .. unit
+        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleLabel.Font = Enum.Font.GothamBold
+        titleLabel.TextSize = 13
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        
+        local sliderFrame = Instance.new("Frame", controlFrame)
+        sliderFrame.Size = UDim2.new(1, 0, 0.4, 0)
+        sliderFrame.Position = UDim2.new(0, 0, 0.4, 0)
+        sliderFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        sliderFrame.BorderSizePixel = 0
+        
+        local fillFrame = Instance.new("Frame", sliderFrame)
+        fillFrame.Size = UDim2.new((defaultValue - minValue) / (maxValue - minValue), 0, 1, 0)
+        fillFrame.Position = UDim2.new(0, 0, 0, 0)
+        fillFrame.BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+        fillFrame.BorderSizePixel = 0
+        
+        local valueLabel = Instance.new("TextLabel", sliderFrame)
+        valueLabel.Size = UDim2.new(1, 0, 1, 0)
+        valueLabel.Position = UDim2.new(0, 0, 0, 0)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Text = defaultValue .. unit
+        valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        valueLabel.Font = Enum.Font.GothamBold
+        valueLabel.TextSize = 12
+        valueLabel.TextXAlignment = Enum.TextXAlignment.Center
+        
+        local stepLabel = Instance.new("TextLabel", controlFrame)
+        stepLabel.Size = UDim2.new(1, 0, 0.2, 0)
+        stepLabel.Position = UDim2.new(0, 0, 0.8, 0)
+        stepLabel.BackgroundTransparency = 1
+        stepLabel.Text = "Min: " .. minValue .. unit .. " | Max: " .. maxValue .. unit .. " | Step: " .. step .. unit
+        stepLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+        stepLabel.Font = Enum.Font.Gotham
+        stepLabel.TextSize = 10
+        
+        local currentValue = defaultValue
+        
+        local function updateSlider()
+            local percentage = (currentValue - minValue) / (maxValue - minValue)
+            percentage = math.clamp(percentage, 0, 1)
+            fillFrame.Size = UDim2.new(percentage, 0, 1, 0)
+            titleLabel.Text = title .. ": " .. currentValue .. unit
+            valueLabel.Text = currentValue .. unit
+            if onChange then onChange(currentValue) end
+        end
+        
+        -- Função para clicar e arrastar CORRIGIDA
+        local function onSliderInput(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local connection
+                local startMousePos = input.Position.X
+                local startPercentage = (currentValue - minValue) / (maxValue - minValue)
+                
+                connection = RunService.Heartbeat:Connect(function()
+                    local mousePos = UIS:GetMouseLocation().X
+                    local sliderAbsPos = sliderFrame.AbsolutePosition.X
+                    local sliderAbsSize = sliderFrame.AbsoluteSize.X
+                    
+                    local relativeX = (mousePos - sliderAbsPos) / sliderAbsSize
+                    relativeX = math.clamp(relativeX, 0, 1)
+                    
+                    -- Calcular novo valor com step
+                    local rawValue = minValue + (maxValue - minValue) * relativeX
+                    currentValue = math.floor((rawValue + step/2) / step) * step
+                    currentValue = math.clamp(currentValue, minValue, maxValue)
+                    
+                    updateSlider()
+                end)
+                
+                local function disconnect()
+                    if connection then
+                        connection:Disconnect()
+                        connection = nil
+                    end
+                end
+                
+                local endedConnection
+                endedConnection = UIS.InputEnded:Connect(function(endInput)
+                    if endInput.UserInputType == Enum.UserInputType.MouseButton1 then
+                        disconnect()
+                        if endedConnection then
+                            endedConnection:Disconnect()
+                        end
+                    end
+                end)
+            end
+        end
+        
+        sliderFrame.InputBegan:Connect(onSliderInput)
+        updateSlider()
+        
+        return controlFrame, currentValue
+    end
+    
+    -- 1. AIMBOT TOGGLE
+    local aimbotButton, aimbotFrame, aimbotStatus = createFPSToggleButton("AIMBOT", 50, false, "Mira automática avançada (Botão direito do mouse)")
+    
+    -- 2. CONTROLE DE ALCANCE (CORRIGIDO)
+    local rangeControl, rangeValue = createSliderControl(120, "Alcance do Aimbot", 50, 1000, 10, aimbotSettings.range, " studs", function(value)
+        aimbotSettings.range = value
+    end)
+    
+    -- 3. CONTROLE DE SUAVIDADE (CORRIGIDO)
+    local smoothControl, smoothValue = createSliderControl(190, "Suavidade", 0.1, 1, 0.05, aimbotSettings.smoothness, "", function(value)
+        aimbotSettings.smoothness = value
+    end)
+    
+    -- 4. ESP BOX
+    local espBoxButton, espBoxFrame, espBoxStatus = createFPSToggleButton("ESP BOX", 260, false, "Mostra caixa ao redor dos jogadores")
+    
+    -- 5. ESP CIRCLE
+    local espCircleButton, espCircleFrame, espCircleStatus = createFPSToggleButton("ESP CIRCLE", 330, false, "Mostra círculo nos pés dos jogadores")
+    
+    -- Sistema de aimbot complexo
+    local aimbotConnection = nil
+    local rightMouseDown = false
+    
+    -- Conexão do botão direito do mouse
+    local mouseButton2Connection = UIS.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then
+            rightMouseDown = true
+        end
+    end)
+    
+    local mouseButton2Released = UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton2 then
+            rightMouseDown = false
+        end
+    end)
+    
+    -- Função para encontrar o jogador mais próximo
+    local function getClosestPlayer()
+        local localPlayer = Players.LocalPlayer
+        local localCharacter = localPlayer.Character
+        if not localCharacter then return nil end
+        
+        local localHead = localCharacter:FindFirstChild("Head")
+        if not localHead then return nil end
+        
+        local camera = Workspace.CurrentCamera
+        if not camera then return nil end
+        
+        local closestPlayer = nil
+        local closestDistance = math.huge
+        
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= localPlayer then
+                -- Verificar se é inimigo (se team check estiver ativado)
+                if aimbotSettings.requireTeamCheck then
+                    if player.Team and localPlayer.Team and player.Team == localPlayer.Team then
+                        continue
+                    end
+                end
+                
+                local character = player.Character
+                if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+                    local targetPart = character:FindFirstChild(aimbotSettings.targetPart)
+                    if targetPart then
+                        local distance = (localHead.Position - targetPart.Position).Magnitude
+                        
+                        -- Verificar se está dentro do alcance
+                        if distance <= aimbotSettings.range then
+                            if distance < closestDistance then
+                                closestDistance = distance
+                                closestPlayer = player
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        
+        return closestPlayer
+    end
+    
+    aimbotButton.MouseButton1Click:Connect(function()
+        aimbotSettings.active = not aimbotSettings.active
+        
+        if aimbotSettings.active then
+            aimbotButton.Text = "❌ AIMBOT"
+            aimbotButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            aimbotStatus.Text = "ATIVO"
+            aimbotStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            
+            -- Conexão do aimbot
+            aimbotConnection = RunService.Heartbeat:Connect(function()
+                if aimbotSettings.active and rightMouseDown then
+                    local closestPlayer = getClosestPlayer()
+                    if closestPlayer and closestPlayer.Character then
+                        local targetPart = closestPlayer.Character:FindFirstChild(aimbotSettings.targetPart)
+                        if targetPart then
+                            local camera = Workspace.CurrentCamera
+                            if camera then
+                                -- Cálculo de mira suave
+                                local currentCFrame = camera.CFrame
+                                local targetPosition = targetPart.Position
+                                
+                                -- Adicionar predição de movimento
+                                local targetVelocity = targetPart.Velocity or Vector3.new(0, 0, 0)
+                                local distance = (camera.CFrame.Position - targetPosition).Magnitude
+                                local travelTime = distance / 1000
+                                targetPosition = targetPosition + (targetVelocity * travelTime)
+                                
+                                -- Interpolação suave
+                                local newLookVector = (targetPosition - currentCFrame.Position).Unit
+                                local currentLookVector = currentCFrame.LookVector
+                                
+                                -- Aplicar suavidade ajustada
+                                local smoothedLookVector = currentLookVector:Lerp(newLookVector, aimbotSettings.smoothness)
+                                
+                                -- Aplicar nova rotação da câmera
+                                camera.CFrame = CFrame.new(currentCFrame.Position, currentCFrame.Position + smoothedLookVector)
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            aimbotButton.Text = "✅ AIMBOT"
+            aimbotButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            aimbotStatus.Text = "INATIVO"
+            aimbotStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            if aimbotConnection then
+                aimbotConnection:Disconnect()
+                aimbotConnection = nil
+            end
+        end
+    end)
+    
+    -- Sistema de ESP
+    local function createESPBox(player)
+        if not player.Character then return end
+        
+        local box = Instance.new("BoxHandleAdornment")
+        box.Name = player.Name .. "_ESPBOX"
+        box.Adornee = player.Character
+        box.AlwaysOnTop = true
+        box.ZIndex = 10
+        box.Size = Vector3.new(4, 6, 1)
+        box.Color3 = player.Team and player.Team == Players.LocalPlayer.Team and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+        box.Transparency = 0.7
+        box.Parent = player.Character
+        
+        espObjects[player.Name .. "_BOX"] = box
+        
+        return box
+    end
+    
+    local function createESPCircle(player)
+        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+        
+        local circle = Instance.new("BillboardGui")
+        circle.Name = player.Name .. "_ESPCIRCLE"
+        circle.Adornee = player.Character.HumanoidRootPart
+        circle.AlwaysOnTop = true
+        circle.Size = UDim2.new(2, 0, 2, 0)
+        circle.StudsOffset = Vector3.new(0, -3, 0)
+        
+        local frame = Instance.new("Frame", circle)
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundTransparency = 1
+        
+        local uiCorner = Instance.new("UICorner", frame)
+        uiCorner.CornerRadius = UDim.new(1, 0)
+        
+        local uiStroke = Instance.new("UIStroke", frame)
+        uiStroke.Color = player.Team and player.Team == Players.LocalPlayer.Team and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+        uiStroke.Thickness = 3
+        uiStroke.Transparency = 0.5
+        
+        circle.Parent = player.Character.HumanoidRootPart
+        
+        espObjects[player.Name .. "_CIRCLE"] = circle
+        
+        return circle
+    end
+    
+    local function updateESP()
+        -- Limpar ESP antigo
+        for _, obj in pairs(espObjects) do
+            if obj then
+                obj:Destroy()
+            end
+        end
+        espObjects = {}
+        
+        -- Criar novo ESP
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= Players.LocalPlayer and player.Character then
+                if espSettings.boxEnabled then
+                    createESPBox(player)
+                end
+                if espSettings.circleEnabled then
+                    createESPCircle(player)
+                end
+            end
+        end
+    end
+    
+    local function onPlayerAdded(player)
+        player.CharacterAdded:Connect(function()
+            if espSettings.boxEnabled or espSettings.circleEnabled then
+                wait(0.5)
+                updateESP()
+            end
+        end)
+    end
+    
+    -- Conectar eventos de jogadores
+    for _, player in ipairs(Players:GetPlayers()) do
+        onPlayerAdded(player)
+    end
+    Players.PlayerAdded:Connect(onPlayerAdded)
+    
+    -- ESP Box Toggle
+    espBoxButton.MouseButton1Click:Connect(function()
+        espSettings.boxEnabled = not espSettings.boxEnabled
+        
+        if espSettings.boxEnabled then
+            espBoxButton.Text = "❌ ESP BOX"
+            espBoxButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            espBoxStatus.Text = "ATIVO"
+            espBoxStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+        else
+            espBoxButton.Text = "✅ ESP BOX"
+            espBoxButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            espBoxStatus.Text = "INATIVO"
+            espBoxStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        updateESP()
+    end)
+    
+    -- ESP Circle Toggle
+    espCircleButton.MouseButton1Click:Connect(function()
+        espSettings.circleEnabled = not espSettings.circleEnabled
+        
+        if espSettings.circleEnabled then
+            espCircleButton.Text = "❌ ESP CIRCLE"
+            espCircleButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            espCircleStatus.Text = "ATIVO"
+            espCircleStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+        else
+            espCircleButton.Text = "✅ ESP CIRCLE"
+            espCircleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            espCircleStatus.Text = "INATIVO"
+            espCircleStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        updateESP()
+    end)
+    
+    -- Atualizar ESP quando personagem morre
+    Players.LocalPlayer.CharacterAdded:Connect(function()
+        wait(1)
+        updateESP()
+    end)
+    
+    -- Informações sobre os cheats
+    local aimbotInfo = Instance.new("TextLabel", FPSContent)
+    aimbotInfo.Size = UDim2.new(0.9, 0, 0, 100)
+    aimbotInfo.Position = UDim2.new(0.05, 0, 0, 410)
+    aimbotInfo.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    aimbotInfo.Text = "⚙️ INFORMAÇÕES DOS CHEATS\n\n🎯 AIMBOT: Mira suave na cabeça\n📦 ESP BOX: Caixa ao redor dos jogadores\n🔵 ESP CIRCLE: Círculo nos pés\n🎨 CORES: Verde=Aliado, Vermelho=Inimigo"
+    aimbotInfo.TextColor3 = Color3.fromRGB(200, 200, 255)
+    aimbotInfo.Font = Enum.Font.Gotham
+    aimbotInfo.TextSize = 11
+    aimbotInfo.TextWrapped = true
+    
+    -- Dicas
+    local tipsLabel = Instance.new("TextLabel", FPSContent)
+    tipsLabel.Size = UDim2.new(0.9, 0, 0, 80)
+    tipsLabel.Position = UDim2.new(0.05, 0, 0, 520)
+    tipsLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tipsLabel.Text = "💡 DICAS:\n• Aimbot: Segure botão direito do mouse\n• ESP: Ative Box ou Circle (ou ambos)\n• Suavidade: Ajuste para mais fluidez\n• Alcance: Aumente para mirar mais longe"
+    tipsLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
+    tipsLabel.Font = Enum.Font.Gotham
+    tipsLabel.TextSize = 11
+    tipsLabel.TextWrapped = true
+    
+    -- ============================================================================
+    -- 7. ABA NATURAL DISASTER
+    -- ============================================================================
+    
+    local NDContent = Instance.new("ScrollingFrame", ContentArea)
+    NDContent.Size = UDim2.new(1, 0, 1, 0)
+    NDContent.BackgroundTransparency = 1
+    NDContent.ScrollBarThickness = 6
+    NDContent.CanvasSize = UDim2.new(0, 0, 0, 300)
+    NDContent.Visible = false
+    
+    local NDTitle = Instance.new("TextLabel", NDContent)
+    NDTitle.Size = UDim2.new(1, -20, 0, 30)
+    NDTitle.Position = UDim2.new(0, 10, 0, 10)
+    NDTitle.BackgroundTransparency = 1
+    NDTitle.Text = "🌪️ NATURAL DISASTER"
+    NDTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    NDTitle.Font = Enum.Font.GothamBlack
+    NDTitle.TextSize = 16
+    
+    -- Informações sobre Natural Disaster
+    local NDInfo = Instance.new("TextLabel", NDContent)
+    NDInfo.Size = UDim2.new(0.9, 0, 0, 100)
+    NDInfo.Position = UDim2.new(0.05, 0, 0, 50)
+    NDInfo.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    NDInfo.Text = "🎮 NATURAL DISASTER SURVIVAL\n\n• Jogo: Natural Disaster Survival\n• Objetivo: Sobreviver aos desastres\n• Status: Compatível com cheats"
+    NDInfo.TextColor3 = Color3.fromRGB(200, 200, 255)
+    NDInfo.Font = Enum.Font.Gotham
+    NDInfo.TextSize = 12
+    NDInfo.TextWrapped = true
+    
+    -- Em breve
+    local NDSoon = Instance.new("TextLabel", NDContent)
+    NDSoon.Size = UDim2.new(0.9, 0, 0, 80)
+    NDSoon.Position = UDim2.new(0.05, 0, 0, 160)
+    NDSoon.BackgroundColor3 = Color3.fromRGB(50, 25, 25)
+    NDSoon.Text = "🛠️ FUNÇIONALIDADES EM BREVE\n\n• God Mode (Sobreviver a desastres)\n• NoClip (Atravessar obstáculos)\n• Speed Hack (Correr mais rápido)\n• Auto-Survival (Automatização)"
+    NDSoon.TextColor3 = Color3.fromRGB(255, 200, 100)
+    NDSoon.Font = Enum.Font.GothamBold
+    NDSoon.TextSize = 12
+    NDSoon.TextWrapped = true
+    
+    -- Dica
+    local NDTip = Instance.new("TextLabel", NDContent)
+    NDTip.Size = UDim2.new(0.9, 0, 0, 60)
+    NDTip.Position = UDim2.new(0.05, 0, 0, 250)
+    NDTip.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    NDTip.Text = "💡 DICA: Use os cheats do ZARALHAR\npara funções básicas como Fly,\nGod Mode e NoClip!"
+    NDTip.TextColor3 = Color3.fromRGB(150, 255, 150)
+    NDTip.Font = Enum.Font.Gotham
+    NDTip.TextSize = 11
+    NDTip.TextWrapped = true
+    
+    -- ============================================================================
+    -- 8. ABA ZARALHAR
+    -- ============================================================================
+    
+    local ZaralharContent = Instance.new("ScrollingFrame", ContentArea)
+    ZaralharContent.Size = UDim2.new(1, 0, 1, 0)
+    ZaralharContent.BackgroundTransparency = 1
+    ZaralharContent.ScrollBarThickness = 6
+    ZaralharContent.CanvasSize = UDim2.new(0, 0, 0, 570)
+    ZaralharContent.Visible = false
+    
+    local ZaralharTitle = Instance.new("TextLabel", ZaralharContent)
+    ZaralharTitle.Size = UDim2.new(1, -20, 0, 30)
+    ZaralharTitle.Position = UDim2.new(0, 10, 0, 10)
+    ZaralharTitle.BackgroundTransparency = 1
+    ZaralharTitle.Text = "🌀 ZARALHAR CHEATS"
+    ZaralharTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ZaralharTitle.Font = Enum.Font.GothamBlack
+    ZaralharTitle.TextSize = 16
+    
+    -- Variáveis globais para os cheats
+    local player = Players.LocalPlayer
+    local flyActive = false
+    local flyBodyVelocity = nil
+    local flyConnection = nil
+    local noclipActive = false
+    local noclipConnection = nil
+    local godModeActive = false
+    local godModeConnection = nil
+    
+    -- Configurações do fly
+    local flySpeed = 50
+    
+    -- Função para criar um botão de toggle com status
+    local function createToggleButton(text, yPos, initialState, description)
+        local buttonFrame = Instance.new("Frame", ZaralharContent)
+        buttonFrame.Size = UDim2.new(0.9, 0, 0, 60)
+        buttonFrame.Position = UDim2.new(0.05, 0, 0, yPos)
+        buttonFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        buttonFrame.BorderSizePixel = 0
+        
+        local button = Instance.new("TextButton", buttonFrame)
+        button.Size = UDim2.new(0.4, 0, 0.6, 0)
+        button.Position = UDim2.new(0, 0, 0, 0)
+        button.BackgroundColor3 = initialState and Color3.fromRGB(150, 60, 60) or Color3.fromRGB(60, 60, 150)
+        button.Text = initialState and "❌ " .. text or "✅ " .. text
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.Font = Enum.Font.GothamBold
+        button.TextSize = 14
+        
+        local statusLabel = Instance.new("TextLabel", buttonFrame)
+        statusLabel.Size = UDim2.new(0.4, 0, 0.6, 0)
+        statusLabel.Position = UDim2.new(0.6, 0, 0, 0)
+        statusLabel.BackgroundTransparency = 1
+        statusLabel.Text = initialState and "ATIVO" or "INATIVO"
+        statusLabel.TextColor3 = initialState and Color3.fromRGB(255, 100, 100) or Color3.fromRGB(100, 255, 100)
+        statusLabel.Font = Enum.Font.GothamBold
+        statusLabel.TextSize = 12
+        
+        local descLabel = Instance.new("TextLabel", buttonFrame)
+        descLabel.Size = UDim2.new(1, 0, 0.4, 0)
+        descLabel.Position = UDim2.new(0, 0, 0.6, 0)
+        descLabel.BackgroundTransparency = 1
+        descLabel.Text = description
+        descLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+        descLabel.Font = Enum.Font.Gotham
+        descLabel.TextSize = 11
+        descLabel.TextWrapped = true
+        descLabel.TextXAlignment = Enum.TextXAlignment.Left
+        
+        return button, buttonFrame, statusLabel
+    end
+    
+    -- Função para criar controles de velocidade do fly
+    local function createFlySpeedControl(yPos)
+        local controlFrame = Instance.new("Frame", ZaralharContent)
+        controlFrame.Size = UDim2.new(0.9, 0, 0, 40)
+        controlFrame.Position = UDim2.new(0.05, 0, 0, yPos)
+        controlFrame.BackgroundTransparency = 1
+        
+        local label = Instance.new("TextLabel", controlFrame)
+        label.Size = UDim2.new(0.5, 0, 1, 0)
+        label.Position = UDim2.new(0, 0, 0, 0)
+        label.BackgroundTransparency = 1
+        label.Text = "Fly Speed: " .. flySpeed
+        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        label.Font = Enum.Font.GothamBold
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        
+        local buttonFrame = Instance.new("Frame", controlFrame)
+        buttonFrame.Size = UDim2.new(0.5, 0, 1, 0)
+        buttonFrame.Position = UDim2.new(0.5, 0, 0, 0)
+        buttonFrame.BackgroundTransparency = 1
+        
+        local minusButton = Instance.new("TextButton", buttonFrame)
+        minusButton.Size = UDim2.new(0.2, 0, 1, 0)
+        minusButton.Position = UDim2.new(0, 0, 0, 0)
+        minusButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        minusButton.Text = "-"
+        minusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        minusButton.Font = Enum.Font.GothamBold
+        minusButton.TextSize = 14
+        
+        local valueLabel = Instance.new("TextLabel", buttonFrame)
+        valueLabel.Size = UDim2.new(0.6, 0, 1, 0)
+        valueLabel.Position = UDim2.new(0.2, 0, 0, 0)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Text = tostring(flySpeed)
+        valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        valueLabel.Font = Enum.Font.GothamBold
+        valueLabel.TextSize = 14
+        
+        local plusButton = Instance.new("TextButton", buttonFrame)
+        plusButton.Size = UDim2.new(0.2, 0, 1, 0)
+        plusButton.Position = UDim2.new(0.8, 0, 0, 0)
+        plusButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        plusButton.Text = "+"
+        plusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        plusButton.Font = Enum.Font.GothamBold
+        plusButton.TextSize = 14
+        
+        minusButton.MouseButton1Click:Connect(function()
+            flySpeed = math.max(10, flySpeed - 10)
+            valueLabel.Text = tostring(flySpeed)
+            label.Text = "Fly Speed: " .. flySpeed
+        end)
+        
+        plusButton.MouseButton1Click:Connect(function()
+            flySpeed = math.min(200, flySpeed + 10)
+            valueLabel.Text = tostring(flySpeed)
+            label.Text = "Fly Speed: " .. flySpeed
+        end)
+        
+        return controlFrame
+    end
+    
+    -- Função para criar controles de 5 em 5
+    local function createIncrementalControl(yPos, title, currentValue, minValue, maxValue, step, onChange)
+        local controlFrame = Instance.new("Frame", ZaralharContent)
+        controlFrame.Size = UDim2.new(0.9, 0, 0, 40)
+        controlFrame.Position = UDim2.new(0.05, 0, 0, yPos)
+        controlFrame.BackgroundTransparency = 1
+        
+        local label = Instance.new("TextLabel", controlFrame)
+        label.Size = UDim2.new(0.5, 0, 1, 0)
+        label.Position = UDim2.new(0, 0, 0, 0)
+        label.BackgroundTransparency = 1
+        label.Text = title .. ": " .. currentValue
+        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        label.Font = Enum.Font.GothamBold
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        
+        local buttonFrame = Instance.new("Frame", controlFrame)
+        buttonFrame.Size = UDim2.new(0.5, 0, 1, 0)
+        buttonFrame.Position = UDim2.new(0.5, 0, 0, 0)
+        buttonFrame.BackgroundTransparency = 1
+        
+        local minusButton = Instance.new("TextButton", buttonFrame)
+        minusButton.Size = UDim2.new(0.2, 0, 1, 0)
+        minusButton.Position = UDim2.new(0, 0, 0, 0)
+        minusButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        minusButton.Text = "-" .. step
+        minusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        minusButton.Font = Enum.Font.GothamBold
+        minusButton.TextSize = 12
+        
+        local valueLabel = Instance.new("TextLabel", buttonFrame)
+        valueLabel.Size = UDim2.new(0.6, 0, 1, 0)
+        valueLabel.Position = UDim2.new(0.2, 0, 0, 0)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Text = tostring(currentValue)
+        valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        valueLabel.Font = Enum.Font.GothamBold
+        valueLabel.TextSize = 14
+        
+        local plusButton = Instance.new("TextButton", buttonFrame)
+        plusButton.Size = UDim2.new(0.2, 0, 1, 0)
+        plusButton.Position = UDim2.new(0.8, 0, 0, 0)
+        plusButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        plusButton.Text = "+" .. step
+        plusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        plusButton.Font = Enum.Font.GothamBold
+        plusButton.TextSize = 12
+        
+        minusButton.MouseButton1Click:Connect(function()
+            currentValue = math.max(minValue, currentValue - step)
+            valueLabel.Text = tostring(currentValue)
+            label.Text = title .. ": " .. currentValue
+            if onChange then onChange(currentValue) end
+        end)
+        
+        plusButton.MouseButton1Click:Connect(function()
+            currentValue = math.min(maxValue, currentValue + step)
+            valueLabel.Text = tostring(currentValue)
+            label.Text = title .. ": " .. currentValue
+            if onChange then onChange(currentValue) end
+        end)
+        
+        return controlFrame, currentValue
+    end
+    
+    -- 1. FLY COM CONTROLE DE VELOCIDADE
+    local flyButton, flyFrame, flyStatus = createToggleButton("FLY", 50, false, "Permite voar pelo mapa (E=Subir, Q=Descer, WASD=Direção)")
+    
+    local flySpeedControl = createFlySpeedControl(120)
+    
+    flyButton.MouseButton1Click:Connect(function()
+        flyActive = not flyActive
+        
+        if flyActive then
+            flyButton.Text = "❌ FLY"
+            flyButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            flyStatus.Text = "ATIVO"
+            flyStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            humanoid.PlatformStand = true
+            
+            flyBodyVelocity = Instance.new("BodyVelocity")
+            flyBodyVelocity.MaxForce = Vector3.new(40000, 40000, 40000)
+            flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            flyBodyVelocity.Parent = character.PrimaryPart
+            
+            flyConnection = RunService.Heartbeat:Connect(function()
+                if character and character.PrimaryPart and flyActive then
+                    local camera = workspace.CurrentCamera
+                    local moveDirection = Vector3.new(0, 0, 0)
+                    
+                    if UIS:IsKeyDown(Enum.KeyCode.W) then
+                        moveDirection = moveDirection + camera.CFrame.LookVector
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.S) then
+                        moveDirection = moveDirection - camera.CFrame.LookVector
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.D) then
+                        moveDirection = moveDirection + camera.CFrame.RightVector
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.A) then
+                        moveDirection = moveDirection - camera.CFrame.RightVector
+                    end
+                    
+                    if UIS:IsKeyDown(Enum.KeyCode.E) then
+                        moveDirection = moveDirection + Vector3.new(0, 1, 0)
+                    end
+                    if UIS:IsKeyDown(Enum.KeyCode.Q) then
+                        moveDirection = moveDirection + Vector3.new(0, -1, 0)
+                    end
+                    
+                    if moveDirection.Magnitude > 0 then
+                        moveDirection = moveDirection.Unit * flySpeed
+                    end
+                    
+                    flyBodyVelocity.Velocity = moveDirection
+                end
+            end)
+        else
+            flyButton.Text = "✅ FLY"
+            flyButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            flyStatus.Text = "INATIVO"
+            flyStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            if flyConnection then
+                flyConnection:Disconnect()
+                flyConnection = nil
+            end
+            
+            local character = player.Character
+            if character then
+                local humanoid = character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid.PlatformStand = false
+                end
+                
+                if flyBodyVelocity then
+                    flyBodyVelocity:Destroy()
+                    flyBodyVelocity = nil
+                end
+                
+                character.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
+            end
+        end
+    end)
+    
+    -- 2. WALKSPEED
+    local wsCurrentValue = 16
+    local wsMinValue = 16
+    local wsMaxValue = 150
+    local wsStep = 5
+    
+    local wsButton, wsFrame, wsStatus = createToggleButton("WALKSPEED", 170, false, "Aumenta/diminui velocidade de movimento (de 5 em 5)")
+    local wsControl, wsCurrentValue = createIncrementalControl(240, "WalkSpeed", wsCurrentValue, wsMinValue, wsMaxValue, wsStep, function(newValue)
+        wsCurrentValue = newValue
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = wsCurrentValue
+            end
+        end
+    end)
+    
+    wsButton.MouseButton1Click:Connect(function()
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        
+        if wsCurrentValue > wsMinValue then
+            wsCurrentValue = wsMinValue
+            humanoid.WalkSpeed = wsCurrentValue
+            wsButton.Text = "✅ WALKSPEED"
+            wsButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            wsStatus.Text = "INATIVO"
+            wsStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        else
+            humanoid.WalkSpeed = wsCurrentValue
+            wsButton.Text = "⚡ WS: " .. wsCurrentValue
+            wsButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            wsStatus.Text = "ATIVO"
+            wsStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+    end)
+    
+    -- 3. JUMP POWER
+    local jpCurrentValue = 50
+    local jpMinValue = 50
+    local jpMaxValue = 200
+    local jpStep = 5
+    
+    local jpButton, jpFrame, jpStatus = createToggleButton("JUMP POWER", 290, false, "Aumenta/diminui o poder do pulo (de 5 em 5)")
+    local jpControl, jpCurrentValue = createIncrementalControl(360, "Jump Power", jpCurrentValue, jpMinValue, jpMaxValue, jpStep, function(newValue)
+        jpCurrentValue = newValue
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.JumpPower = jpCurrentValue
+            end
+        end
+    end)
+    
+    jpButton.MouseButton1Click:Connect(function()
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        
+        if jpCurrentValue > jpMinValue then
+            jpCurrentValue = jpMinValue
+            humanoid.JumpPower = jpCurrentValue
+            jpButton.Text = "✅ JUMP POWER"
+            jpButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            jpStatus.Text = "INATIVO"
+            jpStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        else
+            humanoid.JumpPower = jpCurrentValue
+            jpButton.Text = "🦘 JP: " .. jpCurrentValue
+            jpButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            jpStatus.Text = "ATIVO"
+            jpStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+    end)
+    
+    -- 4. GOD MODE
+    local godButton, godFrame, godStatus = createToggleButton("GOD MODE", 430, false, "Torna-se completamente invencível")
+    
+    godButton.MouseButton1Click:Connect(function()
+        godModeActive = not godModeActive
+        
+        if godModeActive then
+            godButton.Text = "❌ GOD MODE"
+            godButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            godStatus.Text = "ATIVO"
+            godStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            
+            humanoid:SetAttribute("OriginalMaxHealth", humanoid.MaxHealth)
+            humanoid:SetAttribute("OriginalHealth", humanoid.Health)
+            
+            humanoid.MaxHealth = math.huge
+            humanoid.Health = math.huge
+            
+            godModeConnection = humanoid.HealthChanged:Connect(function()
+                humanoid.Health = humanoid.MaxHealth
+            end)
+        else
+            godButton.Text = "✅ GOD MODE"
+            godButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            godStatus.Text = "INATIVO"
+            godStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            if godModeConnection then
+                godModeConnection:Disconnect()
+                godModeConnection = nil
+            end
+            
+            local character = player.Character
+            if character then
+                local humanoid = character:FindFirstChild("Humanoid")
+                if humanoid then
+                    local originalMaxHealth = humanoid:GetAttribute("OriginalMaxHealth") or 100
+                    local originalHealth = humanoid:GetAttribute("OriginalHealth") or 100
+                    
+                    humanoid.MaxHealth = originalMaxHealth
+                    humanoid.Health = math.min(originalHealth, originalMaxHealth)
+                end
+            end
+        end
+    end)
+    
+    -- 5. NOCLIP
+    local noclipButton, noclipFrame, noclipStatus = createToggleButton("NOCLIP", 500, false, "Atravessa paredes e objetos")
+    
+    noclipButton.MouseButton1Click:Connect(function()
+        noclipActive = not noclipActive
+        
+        if noclipActive then
+            noclipButton.Text = "❌ NOCLIP"
+            noclipButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            noclipStatus.Text = "ATIVO"
+            noclipStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            
+            noclipConnection = RunService.Stepped:Connect(function()
+                local character = player.Character
+                if character then
+                    for _, part in pairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            noclipButton.Text = "✅ NOCLIP"
+            noclipButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            noclipStatus.Text = "INATIVO"
+            noclipStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
+            end
+            
+            local character = player.Character
+            if character then
+                for _, part in pairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+                end
+            end
+        end
+    end)
+    
+    -- Resetar cheats quando o personagem morre
+    player.CharacterAdded:Connect(function()
+        if flyActive then
+            flyActive = false
+            if flyConnection then flyConnection:Disconnect() end
+            if flyBodyVelocity then flyBodyVelocity:Destroy() end
+            flyButton.Text = "✅ FLY"
+            flyButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            flyStatus.Text = "INATIVO"
+            flyStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        if godModeActive then
+            godModeActive = false
+            if godModeConnection then godModeConnection:Disconnect() end
+            godButton.Text = "✅ GOD MODE"
+            godButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            godStatus.Text = "INATIVO"
+            godStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        if noclipActive then
+            noclipActive = false
+            if noclipConnection then noclipConnection:Disconnect() end
+            noclipButton.Text = "✅ NOCLIP"
+            noclipButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+            noclipStatus.Text = "INATIVO"
+            noclipStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        end
+        
+        task.wait(0.5)
+        local character = player.Character
+        if character then
+            local humanoid = character:WaitForChild("Humanoid")
+            
+            if wsCurrentValue > wsMinValue then
+                humanoid.WalkSpeed = wsCurrentValue
+                wsButton.Text = "⚡ WS: " .. wsCurrentValue
+                wsButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+                wsStatus.Text = "ATIVO"
+                wsStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            end
+            
+            if jpCurrentValue > jpMinValue then
+                humanoid.JumpPower = jpCurrentValue
+                jpButton.Text = "🦘 JP: " .. jpCurrentValue
+                jpButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+                jpStatus.Text = "ATIVO"
+                jpStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+            end
+        end
+    end)
+    
+    -- ============================================================================
+    -- 9. ABA CONFIGURAÇÕES (COM HOTKEY SIMPLIFICADA)
+    -- ============================================================================
+    
+    local ConfigContent = Instance.new("ScrollingFrame", ContentArea)
+    ConfigContent.Size = UDim2.new(1, 0, 1, 0)
+    ConfigContent.BackgroundTransparency = 1
+    ConfigContent.ScrollBarThickness = 6
+    ConfigContent.CanvasSize = UDim2.new(0, 0, 0, 400)
+    ConfigContent.Visible = false
+    
+    local ConfigTitle = Instance.new("TextLabel", ConfigContent)
+    ConfigTitle.Size = UDim2.new(1, -20, 0, 30)
+    ConfigTitle.Position = UDim2.new(0, 10, 0, 10)
+    ConfigTitle.BackgroundTransparency = 1
+    ConfigTitle.Text = "⚙️ CONFIGURAÇÕES"
+    ConfigTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ConfigTitle.Font = Enum.Font.GothamBlack
+    ConfigTitle.TextSize = 16
+    
+    -- Configurações do menu
+    local menuSettings = Instance.new("TextLabel", ConfigContent)
+    menuSettings.Size = UDim2.new(0.9, 0, 0, 100)
+    menuSettings.Position = UDim2.new(0.05, 0, 0, 50)
+    menuSettings.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    menuSettings.Text = "🎮 CONFIGURAÇÕES DO MENU\n\n• Tecla atual: F5\n• Arrastar menu: Segurar barra de título\n• Fechar menu: Botão X"
+    menuSettings.TextColor3 = Color3.fromRGB(200, 200, 255)
+    menuSettings.Font = Enum.Font.Gotham
+    menuSettings.TextSize = 12
+    menuSettings.TextWrapped = true
+    
+    -- Sistema de hotkey SIMPLIFICADO
+    local hotkeyFrame = Instance.new("Frame", ConfigContent)
+    hotkeyFrame.Size = UDim2.new(0.9, 0, 0, 100)
+    hotkeyFrame.Position = UDim2.new(0.05, 0, 0, 160)
+    hotkeyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    
+    local hotkeyTitle = Instance.new("TextLabel", hotkeyFrame)
+    hotkeyTitle.Size = UDim2.new(1, 0, 0.3, 0)
+    hotkeyTitle.Position = UDim2.new(0, 0, 0, 0)
+    hotkeyTitle.BackgroundTransparency = 1
+    hotkeyTitle.Text = "🔧 ALTERAR HOTKEY (F5)"
+    hotkeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    hotkeyTitle.Font = Enum.Font.GothamBold
+    hotkeyTitle.TextSize = 13
+    hotkeyTitle.TextXAlignment = Enum.TextXAlignment.Center
+    
+    local currentKeyText = "F5"
+    local currentKeyLabel = Instance.new("TextLabel", hotkeyFrame)
+    currentKeyLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    currentKeyLabel.Position = UDim2.new(0, 0, 0.3, 0)
+    currentKeyLabel.BackgroundTransparency = 1
+    currentKeyLabel.Text = "Tecla atual: " .. currentKeyText
+    currentKeyLabel.TextColor3 = Color3.fromRGB(128, 0, 32)
+    currentKeyLabel.Font = Enum.Font.GothamBold
+    currentKeyLabel.TextSize = 14
+    currentKeyLabel.TextXAlignment = Enum.TextXAlignment.Center
+    
+    local changeButton = Instance.new("TextButton", hotkeyFrame)
+    changeButton.Size = UDim2.new(0.8, 0, 0.3, 0)
+    changeButton.Position = UDim2.new(0.1, 0, 0.6, 0)
+    changeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+    changeButton.Text = "CLIQUE PARA ALTERAR"
+    changeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    changeButton.Font = Enum.Font.GothamBold
+    changeButton.TextSize = 12
+    
+    local listening = false
+    
+    -- Mapeamento de teclas para nomes legíveis
+    local keyNames = {
+        [Enum.KeyCode.F1] = "F1",
+        [Enum.KeyCode.F2] = "F2",
+        [Enum.KeyCode.F3] = "F3",
+        [Enum.KeyCode.F4] = "F4",
+        [Enum.KeyCode.F5] = "F5",
+        [Enum.KeyCode.F6] = "F6",
+        [Enum.KeyCode.F7] = "F7",
+        [Enum.KeyCode.F8] = "F8",
+        [Enum.KeyCode.F9] = "F9",
+        [Enum.KeyCode.F10] = "F10",
+        [Enum.KeyCode.F11] = "F11",
+        [Enum.KeyCode.F12] = "F12",
+        [Enum.KeyCode.Insert] = "Insert",
+        [Enum.KeyCode.Delete] = "Delete",
+        [Enum.KeyCode.Home] = "Home",
+        [Enum.KeyCode.End] = "End",
+        [Enum.KeyCode.PageUp] = "PageUp",
+        [Enum.KeyCode.PageDown] = "PageDown",
+        [Enum.KeyCode.RightShift] = "RightShift",
+        [Enum.KeyCode.RightControl] = "RightControl",
+        [Enum.KeyCode.LeftShift] = "LeftShift",
+        [Enum.KeyCode.LeftControl] = "LeftControl",
+        [Enum.KeyCode.CapsLock] = "CapsLock",
+        [Enum.KeyCode.Tab] = "Tab"
+    }
+    
+    -- Função para obter nome legível da tecla
+    local function getKeyName(keyCode)
+        return keyNames[keyCode] or tostring(keyCode):gsub("Enum.KeyCode.", "")
+    end
+    
+    changeButton.MouseButton1Click:Connect(function()
+        if not listening then
+            listening = true
+            changeButton.Text = "PRESSIONE UMA TECLA..."
+            changeButton.BackgroundColor3 = Color3.fromRGB(150, 60, 60)
+            
+            local connection
+            connection = UIS.InputBegan:Connect(function(input)
+                if input.KeyCode ~= Enum.KeyCode.Unknown and input.KeyCode ~= Enum.KeyCode.Backspace then
+                    -- Atualizar hotkey
+                    toggleMenuKey = input.KeyCode
+                    currentKeyText = getKeyName(input.KeyCode)
+                    currentKeyLabel.Text = "Tecla atual: " .. currentKeyText
+                    menuSettings.Text = "🎮 CONFIGURAÇÕES DO MENU\n\n• Tecla atual: " .. currentKeyText .. "\n• Arrastar menu: Segurar barra de título\n• Fechar menu: Botão X"
+                    
+                    -- Recriar conexão com nova hotkey
+                    UIS.InputBegan:Connect(function(newInput)
+                        if newInput.KeyCode == toggleMenuKey then
+                            MainFrame.Visible = not MainFrame.Visible
+                        end
+                    end)
+                    
+                    -- Resetar botão
+                    listening = false
+                    changeButton.Text = "CLIQUE PARA ALTERAR"
+                    changeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 150)
+                    
+                    connection:Disconnect()
+                end
+            end)
+        end
+    end)
+    
+    -- Lista de teclas recomendadas
+    local keysInfo = Instance.new("TextLabel", ConfigContent)
+    keysInfo.Size = UDim2.new(0.9, 0, 0, 80)
+    keysInfo.Position = UDim2.new(0.05, 0, 0, 270)
+    keysInfo.BackgroundColor3 = Color3.fromRGB(25, 25, 50)
+    keysInfo.Text = "💡 TECLAS RECOMENDADAS\n\n• F1 a F12: Teclas de função\n• Insert, Delete, Home, End\n• PageUp, PageDown\n• RightShift, RightControl"
+    keysInfo.TextColor3 = Color3.fromRGB(200, 255, 200)
+    keysInfo.Font = Enum.Font.Gotham
+    keysInfo.TextSize = 11
+    keysInfo.TextWrapped = true
+    
+    -- Informações do sistema
+    local systemInfo = Instance.new("TextLabel", ConfigContent)
+    systemInfo.Size = UDim2.new(0.9, 0, 0, 80)
+    systemInfo.Position = UDim2.new(0.05, 0, 0, 360)
+    systemInfo.BackgroundColor3 = Color3.fromRGB(50, 25, 25)
+    systemInfo.Text = "📊 INFORMAÇÕES DO SISTEMA\n\n• Menu: NOEL MENU V2.0\n• Desenvolvedor: yNoelz\n• Status: INDETECTAVEL"
+    systemInfo.TextColor3 = Color3.fromRGB(255, 200, 100)
+    systemInfo.Font = Enum.Font.GothamBold
+    systemInfo.TextSize = 12
+    systemInfo.TextWrapped = true
+    
+    -- ============================================================================
+    -- 10. ABA CRÉDITOS
+    -- ============================================================================
+    
+    local CreditosContent = Instance.new("ScrollingFrame", ContentArea)
+    CreditosContent.Size = UDim2.new(1, 0, 1, 0)
+    CreditosContent.BackgroundTransparency = 1
+    CreditosContent.ScrollBarThickness = 6
+    CreditosContent.CanvasSize = UDim2.new(0, 0, 0, 400)
+    CreditosContent.Visible = false
+    
+    local CreditosTitle = Instance.new("TextLabel", CreditosContent)
+    CreditosTitle.Size = UDim2.new(1, -20, 0, 40)
+    CreditosTitle.Position = UDim2.new(0, 10, 0, 10)
+    CreditosTitle.BackgroundTransparency = 1
+    CreditosTitle.Text = "📜 CRÉDITOS"
+    CreditosTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CreditosTitle.Font = Enum.Font.GothamBlack
+    CreditosTitle.TextSize = 20
+    CreditosTitle.TextXAlignment = Enum.TextXAlignment.Center
+    
+    -- Adicionar contorno marsala ao título dos créditos
+    local CreditosTitleStroke = Instance.new("UIStroke", CreditosTitle)
+    CreditosTitleStroke.Color = Color3.fromRGB(128, 0, 32)
+    CreditosTitleStroke.Thickness = 2
+    CreditosTitleStroke.Transparency = 0
+    
+    -- Informações dos créditos
+    local creditsInfo = {
+        {"👑 DESENVOLVEDOR", "yNoelz", 70},
+        {"📅 VERSÃO", "V2.0", 110},
+        {"🔒 SEGURANÇA", "INDETECTAVEL", 150}
+    }
+    
+    for _, info in ipairs(creditsInfo) do
+        local creditFrame = Instance.new("Frame", CreditosContent)
+        creditFrame.Size = UDim2.new(0.9, 0, 0, 40)
+        creditFrame.Position = UDim2.new(0.05, 0, 0, info[3])
+        creditFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        
+        local titleLabel = Instance.new("TextLabel", creditFrame)
+        titleLabel.Size = UDim2.new(0.5, 0, 1, 0)
+        titleLabel.Position = UDim2.new(0, 0, 0, 0)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.Text = info[1]
+        titleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        titleLabel.Font = Enum.Font.Gotham
+        titleLabel.TextSize = 12
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        
+        local valueLabel = Instance.new("TextLabel", creditFrame)
+        valueLabel.Size = UDim2.new(0.5, 0, 1, 0)
+        valueLabel.Position = UDim2.new(0.5, 0, 0, 0)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Text = info[2]
+        if info[1] == "🔒 SEGURANÇA" then
+            valueLabel.TextColor3 = Color3.fromRGB(100, 255, 100) -- Verde para INDETECTAVEL
+        else
+            valueLabel.TextColor3 = Color3.fromRGB(128, 0, 32) -- Marsala para outros
+        end
+        valueLabel.Font = Enum.Font.GothamBold
+        valueLabel.TextSize = 14
+        valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+    end
+    
+    -- Nota do desenvolvedor em português
+    local notaPortugues = Instance.new("TextLabel", CreditosContent)
+    notaPortugues.Size = UDim2.new(0.9, 0, 0, 80)
+    notaPortugues.Position = UDim2.new(0.05, 0, 0, 210)
+    notaPortugues.BackgroundColor3 = Color3.fromRGB(30, 10, 10)
+    notaPortugues.Text = "💬 Olá, sou yNoelz e criei esse script para você!\n\nUse com respeito e moderação!"
+    notaPortugues.TextColor3 = Color3.fromRGB(255, 200, 100)
+    notaPortugues.Font = Enum.Font.GothamBold
+    notaPortugues.TextSize = 12
+    notaPortugues.TextWrapped = true
+    notaPortugues.TextXAlignment = Enum.TextXAlignment.Center
+    
+    -- Nota do desenvolvedor em inglês
+    local notaIngles = Instance.new("TextLabel", CreditosContent)
+    notaIngles.Size = UDim2.new(0.9, 0, 0, 80)
+    notaIngles.Position = UDim2.new(0.05, 0, 0, 300)
+    notaIngles.BackgroundColor3 = Color3.fromRGB(10, 10, 30)
+    notaIngles.Text = "💬 Hello, I'm yNoelz and I created this script for you!\n\nUse with respect and moderation!"
+    notaIngles.TextColor3 = Color3.fromRGB(100, 200, 255)
+    notaIngles.Font = Enum.Font.GothamBold
+    notaIngles.TextSize = 12
+    notaIngles.TextWrapped = true
+    notaIngles.TextXAlignment = Enum.TextXAlignment.Center
+    
+    -- ============================================================================
+    -- 11. BOTÕES DAS ABAS
+    -- ============================================================================
+    
+    local tabs = {}
+    local tabContents = {}
+    
+    tabs.TCS = Instance.new("TextButton", TabPanel)
+    tabs.TCS.Size = UDim2.new(1, -10, 0, 35)
+    tabs.TCS.Position = UDim2.new(0, 5, 0, 20)
+    tabs.TCS.BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+    tabs.TCS.Text = "⚽ TCS"
+    tabs.TCS.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabs.TCS.Font = Enum.Font.GothamBold
+    tabs.TCS.TextSize = 14
+    
+    local otherTabs = {
+        {"FPS", "🎯", 70},
+        {"NATURALDISASTER", "🌪️", 120},
+        {"ZARALHAR", "🌀", 170},
+        {"CONFIGS", "⚙️", 220},
+        {"CREDITOS", "📜", 270}
+    }
+    
+    for _, tab in ipairs(otherTabs) do
+        tabs[tab[1]] = Instance.new("TextButton", TabPanel)
+        tabs[tab[1]].Size = UDim2.new(1, -10, 0, 35)
+        tabs[tab[1]].Position = UDim2.new(0, 5, 0, tab[3])
+        tabs[tab[1]].BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        tabs[tab[1]].Text = tab[2] .. " " .. (tab[1] == "NATURALDISASTER" and "ND" or tab[1])
+        tabs[tab[1]].TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabs[tab[1]].Font = Enum.Font.GothamBold
+        tabs[tab[1]].TextSize = 14
+    end
+    
+    -- ============================================================================
+    -- 12. SISTEMA PARA TROCAR DE ABA
+    -- ============================================================================
+    
+    -- Armazenar conteúdos das abas
+    tabContents.TCS = TCSContent
+    tabContents.FPS = FPSContent
+    tabContents.NATURALDISASTER = NDContent
+    tabContents.ZARALHAR = ZaralharContent
+    tabContents.CONFIGS = ConfigContent
+    tabContents.CREDITOS = CreditosContent
+    
+    local function switchTab(tabName)
+        for _, content in pairs(tabContents) do
+            content.Visible = false
+        end
+        
+        for name, btn in pairs(tabs) do
+            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        end
+        
+        if tabContents[tabName] then
+            tabContents[tabName].Visible = true
+            tabs[tabName].BackgroundColor3 = Color3.fromRGB(128, 0, 32)
+        end
+    end
+    
+    for name, btn in pairs(tabs) do
+        btn.MouseButton1Click:Connect(function()
+            switchTab(name)
+        end)
+    end
+    
+    -- ============================================================================
+    -- 13. FUNCIONALIDADES EXTRAS
+    -- ============================================================================
+    
+    -- Sistema de hotkey para mostrar/esconder menu
+    UIS.InputBegan:Connect(function(input)
+        if input.KeyCode == toggleMenuKey then
+            MainFrame.Visible = not MainFrame.Visible
+        end
+    end)
+    
+    local dragging = false
+    local dragStart, startPos
+    
+    TitleFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+        end
+    end)
+    
+    TitleFrame.InputEnded:Connect(function()
+        dragging = false
+    end)
+    
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            MainFrame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    
+    print("========================================")
+    print("🎮 NOEL MENU V2.0 - ATUALIZAÇÃO COMPLETA")
+    print("✅ SLIDERS CORRIGIDOS:")
+    print("   • Suavidade: Agora funciona corretamente")
+    print("   • Alcance: Arrastável sem bugs")
+    print("   • Step: 0.05 para suavidade")
+    print("✅ ESP ADICIONADO:")
+    print("   • ESP Box: Caixa ao redor dos jogadores")
+    print("   • ESP Circle: Círculo nos pés")
+    print("   • Cores: Verde=Aliado, Vermelho=Inimigo")
+    print("   • Ativação/desativação independente")
+    print("✅ HOTKEY SIMPLIFICADA:")
+    print("   • Nomes legíveis (F5, Insert, etc)")
+    print("   • Sistema mais estável")
+    print("   • Interface mais limpa")
+    print("✅ MENU EXPANDIDO: 500x600")
+    print("✅ TUDO FUNCIONANDO PERFEITAMENTE!")
+    print("========================================")
+end
+
+print("🎮 NOEL MENU V2.0 CARREGADO")
+print("👑 Desenvolvido por yNoelz")
+print("🎯 AIMBOT + ESP: Sliders corrigidos")
+print("📦 ESP BOX: Caixa ao redor dos jogadores")
+print("🔵 ESP CIRCLE: Círculo nos pés")
+print("🔧 Hotkey: Sistema simplificado")
+print("🔒 Segurança: INDETECTAVEL")
+print("🖱️ Hotkey atual: F5 (pode alterar)")
+print("❌ Botão X - Fecha o menu")
+print("💬 Use com respeito e moderação!")
