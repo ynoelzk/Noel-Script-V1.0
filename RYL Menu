@@ -1,0 +1,985 @@
+--[[
+    RYL_MENU v14.0 - THE DEFINITIVE HITBOX & FLING UPDATE
+--]]
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Limpeza absoluta de execuções anteriores
+if CoreGui:FindFirstChild("RYL_MENU") then CoreGui.RYL_MENU:Destroy() end
+if _G.AimbotConnection then _G.AimbotConnection:Disconnect() end
+if _G.ESPConnection then _G.ESPConnection:Disconnect() end
+if _G.NDSafeConnection then _G.NDSafeConnection:Disconnect() end
+if _G.NDPredictConnection then _G.NDPredictConnection:Disconnect() end
+if _G.NDAntiPushConnection then _G.NDAntiPushConnection:Disconnect() end
+if _G.TriggerbotConnection then _G.TriggerbotConnection:Disconnect() end
+if _G.FlyConnection then _G.FlyConnection:Disconnect() end
+if _G.GodModeConnection then _G.GodModeConnection:Disconnect() end
+if _G.NoclipConnection then _G.NoclipConnection:Disconnect() end 
+if _G.ClickTPConnection then _G.ClickTPConnection:Disconnect() end
+if _G.FlingConnection then _G.FlingConnection:Disconnect() end
+if _G.AntiGrabConnection then _G.AntiGrabConnection:Disconnect() end
+if _G.WeaponESPConnection then _G.WeaponESPConnection:Disconnect() end
+if _G.FOVCircle then _G.FOVCircle:Remove() end
+
+if _G.FlyTracks then
+    if _G.FlyTracks.Idle then _G.FlyTracks.Idle:Stop() end
+    if _G.FlyTracks.Move then _G.FlyTracks.Move:Stop() end
+    _G.FlyTracks = nil
+end
+
+-- Estados Globais
+_G.FPS_Settings = _G.FPS_Settings or {
+    Aimbot = false,
+    ESP = false,
+    Triggerbot = false,
+    Fly = false,
+    GodMode = false,
+    Noclip = false,
+    ClickTP = false,
+    WeaponESP = false,
+    Fling = false,
+    AntiGrab = false,
+    SpeedValue = 16,
+    JumpValue = 50,
+    Aimbot_FOV_Radius = 150,
+    Aimbot_Max_Distance = 500,
+    
+    ND_FlingDebris = false,
+    ND_GodTower = false,
+    ND_AntiPush = false,
+    ND_Predictor = false,
+    ND_NoVisuals = false
+}
+local isAiming = false
+
+-- Círculo Visual de FOV
+local fovCircle = Drawing.new("Circle")
+fovCircle.Thickness = 1.5
+fovCircle.NumSides = 60
+fovCircle.Radius = _G.FPS_Settings.Aimbot_FOV_Radius
+fovCircle.Filled = false
+fovCircle.Transparency = 0.5
+fovCircle.Color = Color3.fromRGB(255, 30, 30)
+fovCircle.Visible = false
+_G.FOVCircle = fovCircle
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton2 then isAiming = true end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then isAiming = false end
+end)
+
+-- ======================= INTERFACE MELHORADA =======================
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "RYL_MENU"
+screenGui.Parent = CoreGui
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "Main"
+mainFrame.Size = UDim2.new(0, 540, 0, 520)
+mainFrame.Position = UDim2.new(0.5, -270, 0.5, -260)
+mainFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+mainFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 10)
+uiCorner.Parent = mainFrame
+
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Color = Color3.fromRGB(160, 30, 30)
+uiStroke.Thickness = 3.5
+uiStroke.Parent = mainFrame
+
+-- Header com degradê e cantos arredondados
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 52)
+titleBar.BackgroundColor3 = Color3.fromRGB(160, 30, 30)
+titleBar.Active = true
+titleBar.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 10)
+titleCorner.Parent = titleBar
+
+local titleGradient = Instance.new("UIGradient")
+titleGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 30, 30)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(230, 70, 20)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 140, 0))
+}
+titleGradient.Rotation = 90
+titleGradient.Parent = titleBar
+
+-- Título com sombras glitch
+local titleText = Instance.new("TextLabel")
+titleText.Size = UDim2.new(1, -80, 1, 0)
+titleText.Position = UDim2.new(0, 40, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.Text = "RYL MENU v14.0"
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.Font = Enum.Font.GothamBlack
+titleText.TextSize = 22
+titleText.TextXAlignment = Enum.TextXAlignment.Center
+titleText.Parent = titleBar
+
+local glitchShadow = Instance.new("TextLabel")
+glitchShadow.Size = titleText.Size
+glitchShadow.Position = titleText.Position + UDim2.new(0, 2, 0, 1)
+glitchShadow.BackgroundTransparency = 1
+glitchShadow.Text = titleText.Text
+glitchShadow.TextColor3 = Color3.fromRGB(255, 100, 0)
+glitchShadow.Font = titleText.Font
+glitchShadow.TextSize = titleText.TextSize
+glitchShadow.TextXAlignment = Enum.TextXAlignment.Center
+glitchShadow.TextTransparency = 0.6
+glitchShadow.Parent = titleBar
+
+local glitchShadow2 = Instance.new("TextLabel")
+glitchShadow2.Size = titleText.Size
+glitchShadow2.Position = titleText.Position - UDim2.new(0, 1, 0, 1)
+glitchShadow2.BackgroundTransparency = 1
+glitchShadow2.Text = titleText.Text
+glitchShadow2.TextColor3 = Color3.fromRGB(200, 0, 0)
+glitchShadow2.Font = titleText.Font
+glitchShadow2.TextSize = titleText.TextSize
+glitchShadow2.TextXAlignment = Enum.TextXAlignment.Center
+glitchShadow2.TextTransparency = 0.7
+glitchShadow2.Parent = titleBar
+
+-- Botão fechar com hover
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 36, 0, 36)
+closeButton.Position = UDim2.new(1, -42, 0, 8)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+closeButton.Text = "✕"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBlack
+closeButton.TextSize = 20
+closeButton.Parent = titleBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+closeButton.MouseButton1Click:Connect(function()
+    if fovCircle then fovCircle:Remove() end
+    screenGui:Destroy()
+end)
+closeButton.MouseEnter:Connect(function()
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+end)
+closeButton.MouseLeave:Connect(function()
+    closeButton.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+end)
+
+-- Conteúdo e Abas
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, -16, 1, -62)
+contentFrame.Position = UDim2.new(0, 8, 0, 56)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+local tabBar = Instance.new("Frame")
+tabBar.Size = UDim2.new(0, 120, 1, 0)
+tabBar.BackgroundTransparency = 1
+tabBar.Parent = contentFrame
+
+local mainContent = Instance.new("Frame")
+mainContent.Size = UDim2.new(1, -130, 1, 0)
+mainContent.Position = UDim2.new(0, 130, 0, 0)
+mainContent.BackgroundTransparency = 1
+mainContent.Parent = contentFrame
+
+local tabs = {"FPS", "Natural Desastre", "The Classic Soccer", "Zaralho", "Tycoon"}
+local pages, tabButtons = {}, {}
+for _, name in ipairs(tabs) do
+    local page = Instance.new("ScrollingFrame")
+    page.Name = name .. "_Page"
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.BackgroundTransparency = 1
+    page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    page.ScrollBarThickness = 5
+    page.Visible = false
+    page.Parent = mainContent
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 8)
+    layout.Parent = page
+    pages[name] = page
+end
+
+-- Adiciona página de Configurações
+local settingsPage = Instance.new("ScrollingFrame")
+settingsPage.Name = "Settings_Page"
+settingsPage.Size = UDim2.new(1, 0, 1, 0)
+settingsPage.BackgroundTransparency = 1
+settingsPage.Visible = false
+settingsPage.Parent = mainContent
+local settingsLayout = Instance.new("UIListLayout")
+settingsLayout.Padding = UDim.new(0, 8)
+settingsLayout.Parent = settingsPage
+pages["⚙️ Configurações"] = settingsPage
+
+local settingsPlaceholder = Instance.new("TextLabel")
+settingsPlaceholder.Size = UDim2.new(1, -10, 0, 40)
+settingsPlaceholder.Text = "⚙️ Configurações\n\nEm breve: Tema, Transparência, etc."
+settingsPlaceholder.TextColor3 = Color3.fromRGB(180, 180, 180)
+settingsPlaceholder.BackgroundTransparency = 1
+settingsPlaceholder.Font = Enum.Font.Gotham
+settingsPlaceholder.TextSize = 14
+settingsPlaceholder.TextXAlignment = Enum.TextXAlignment.Left
+settingsPlaceholder.Parent = settingsPage
+
+-- Funções Geradoras de UI
+local function createButtonElement(tabName, text, color, onClickCallback)
+    local targetPage = pages[tabName]
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 42)
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 13
+    btn.TextXAlignment = Enum.TextXAlignment.Center
+    btn.Text = text
+    btn.TextColor3 = color or Color3.fromRGB(255, 255, 255)
+    btn.Parent = targetPage
+    local bCorner = Instance.new("UICorner")
+    bCorner.CornerRadius = UDim.new(0, 6)
+    bCorner.Parent = btn
+    local bStroke = Instance.new("UIStroke")
+    bStroke.Color = Color3.fromRGB(40, 40, 40)
+    bStroke.Parent = btn
+    btn.MouseButton1Click:Connect(function() pcall(onClickCallback) end)
+end
+
+local function createToggleElement(tabName, configKey, text, onToggleCallback)
+    local targetPage = pages[tabName]
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 42)
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 13
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Parent = targetPage
+    local bCorner = Instance.new("UICorner")
+    bCorner.CornerRadius = UDim.new(0, 6)
+    bCorner.Parent = btn
+    local bStroke = Instance.new("UIStroke")
+    bStroke.Color = Color3.fromRGB(40, 40, 40)
+    bStroke.Parent = btn
+    local indicator = Instance.new("Frame")
+    indicator.Size = UDim2.new(0, 12, 1, -16)
+    indicator.Position = UDim2.new(1, -22, 0, 8)
+    indicator.Parent = btn
+    local iCorner = Instance.new("UICorner")
+    iCorner.CornerRadius = UDim.new(1, 0)
+    iCorner.Parent = indicator
+
+    local function updateVisual()
+        if _G.FPS_Settings[configKey] then
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            indicator.BackgroundColor3 = Color3.fromRGB(0, 220, 100)
+            btn.Text = "  [ ON ]  " .. text
+        else
+            btn.TextColor3 = Color3.fromRGB(150, 150, 150)
+            indicator.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+            btn.Text = "  [ OFF ]  " .. text
+        end
+    end
+    updateVisual()
+
+    btn.MouseButton1Click:Connect(function()
+        _G.FPS_Settings[configKey] = not _G.FPS_Settings[configKey]
+        updateVisual()
+        pcall(onToggleCallback, _G.FPS_Settings[configKey])
+    end)
+end
+
+local function createSliderElement(tabName, configKey, min, max, default, titleText, unit, callback)
+    local targetPage = pages[tabName]
+    local sliderFrame = Instance.new("Frame")
+    sliderFrame.Size = UDim2.new(1, -10, 0, 55)
+    sliderFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    sliderFrame.Parent = targetPage
+    local sfCorner = Instance.new("UICorner")
+    sfCorner.CornerRadius = UDim.new(0, 6)
+    sfCorner.Parent = sliderFrame
+    local sfStroke = Instance.new("UIStroke")
+    sfStroke.Color = Color3.fromRGB(40, 40, 40)
+    sfStroke.Parent = sliderFrame
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Position = UDim2.new(0, 10, 0, 6)
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.GothamSemibold
+    label.TextColor3 = Color3.fromRGB(220, 220, 220)
+    label.TextSize = 12
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Text = titleText .. ": " .. default .. unit
+    label.Parent = sliderFrame
+    local container = Instance.new("TextButton")
+    container.Size = UDim2.new(1, -20, 0, 8)
+    container.Position = UDim2.new(0, 10, 0, 34)
+    container.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    container.Text = ""
+    container.AutoButtonColor = false
+    container.Parent = sliderFrame
+    local cCorner = Instance.new("UICorner")
+    cCorner.CornerRadius = UDim.new(1, 0)
+    cCorner.Parent = container
+    local fillBar = Instance.new("Frame")
+    fillBar.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+    fillBar.BackgroundColor3 = Color3.fromRGB(160, 30, 30)
+    fillBar.BorderSizePixel = 0
+    fillBar.Parent = container
+    local fCorner = Instance.new("UICorner")
+    fCorner.CornerRadius = UDim.new(1, 0)
+    fCorner.Parent = fillBar
+    local knob = Instance.new("Frame")
+    knob.Size = UDim2.new(0, 14, 0, 14)
+    knob.Position = UDim2.new((default - min) / (max - min), -7, 0.5, -7)
+    knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    knob.Parent = container
+    local kCorner = Instance.new("UICorner")
+    kCorner.CornerRadius = UDim.new(1, 0)
+    kCorner.Parent = knob
+    local isSliding = false
+
+    local function updateSlider(input)
+        local percentage = math.clamp((input.Position.X - container.AbsolutePosition.X) / container.AbsoluteSize.X, 0, 1)
+        local value = math.floor(min + (percentage * (max - min)))
+        _G.FPS_Settings[configKey] = value
+        label.Text = titleText .. ": " .. value .. unit
+        fillBar.Size = UDim2.new(percentage, 0, 1, 0)
+        knob.Position = UDim2.new(percentage, -7, 0.5, -7)
+        if callback then pcall(callback, value) end
+    end
+
+    container.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then isSliding = true ; updateSlider(input) end end)
+    UserInputService.InputChanged:Connect(function(input) if isSliding and input.UserInputType == Enum.UserInputType.MouseMovement then updateSlider(input) end end)
+    UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then isSliding = false end end)
+end
+
+-- Criação das abas com hover melhorado
+local selectedTab = nil
+for i, name in ipairs(tabs) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 34)
+    btn.Position = UDim2.new(0, 5, 0, 10 + (i-1)*50)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 12
+    btn.Parent = tabBar
+
+    local bCorner = Instance.new("UICorner")
+    bCorner.CornerRadius = UDim.new(0, 5)
+    bCorner.Parent = btn
+
+    btn.MouseEnter:Connect(function()
+        if btn ~= selectedTab then
+            btn.BackgroundColor3 = Color3.fromRGB(100, 20, 20)
+            btn.TextColor3 = Color3.fromRGB(255, 200, 200)
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        if btn ~= selectedTab then
+            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+        end
+    end)
+
+    btn.MouseButton1Click:Connect(function()
+        for _, b in ipairs(tabButtons) do
+            b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            b.TextColor3 = Color3.fromRGB(200, 200, 200)
+        end
+        if settingsBtn then
+            settingsBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        end
+        btn.BackgroundColor3 = Color3.fromRGB(150, 25, 25)
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        selectedTab = btn
+
+        for pageName, pageFrame in pairs(pages) do
+            pageFrame.Visible = (pageName == name)
+        end
+    end)
+    table.insert(tabButtons, btn)
+end
+
+local settingsBtn = Instance.new("TextButton")
+settingsBtn.Size = UDim2.new(0, 36, 0, 36)
+settingsBtn.Position = UDim2.new(0, 5, 1, -46)   
+settingsBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+settingsBtn.Text = "⚙️"
+settingsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+settingsBtn.Font = Enum.Font.GothamBold
+settingsBtn.TextSize = 18
+settingsBtn.Parent = tabBar
+
+local settingsCorner = Instance.new("UICorner")
+settingsCorner.CornerRadius = UDim.new(0, 8)
+settingsCorner.Parent = settingsBtn
+
+settingsBtn.MouseEnter:Connect(function()
+    if settingsBtn ~= selectedTab then
+        settingsBtn.BackgroundColor3 = Color3.fromRGB(100, 20, 20)
+    end
+end)
+settingsBtn.MouseLeave:Connect(function()
+    if settingsBtn ~= selectedTab then
+        settingsBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end
+end)
+
+settingsBtn.MouseButton1Click:Connect(function()
+    for _, b in ipairs(tabButtons) do
+        b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        b.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+    settingsBtn.BackgroundColor3 = Color3.fromRGB(150, 25, 25)
+    settingsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    selectedTab = settingsBtn
+
+    for pageName, pageFrame in pairs(pages) do
+        pageFrame.Visible = (pageName == "⚙️ Configurações")
+    end
+end)
+
+-- ========================================================================
+-- LÓGICAS DOS CHEATS (INALTERADAS DA ABA FPS E ND)
+-- ========================================================================
+
+local function isTargetVisible(targetCharacter, headPosition)
+    local charParts = LocalPlayer.Character or workspace
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+    raycastParams.FilterDescendantsInstances = {charParts, targetCharacter, Camera}
+    raycastParams.IgnoreWater = true
+    local raycastResult = workspace:Raycast(Camera.CFrame.Position, headPosition - Camera.CFrame.Position, raycastParams)
+    return raycastResult == nil
+end
+
+local function getClosestVisibleEnemy()
+    local closestTarget = nil
+    local shortestDistance = _G.FPS_Settings.Aimbot_FOV_Radius
+    local mousePos = UserInputService:GetMouseLocation()
+    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("Head") then return nil end
+    local localHeadPos = LocalPlayer.Character.Head.Position
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and (not p.Team or p.Team ~= LocalPlayer.Team) and p.Character and p.Character:FindFirstChild("Head") then
+            local hum = p.Character:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 then
+                local head = p.Character.Head
+                local distanceInStuds = (localHeadPos - head.Position).Magnitude
+                if distanceInStuds <= _G.FPS_Settings.Aimbot_Max_Distance then
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                    if onScreen then
+                        local distanceToMouse = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                        if distanceToMouse < shortestDistance and isTargetVisible(p.Character, head.Position) then
+                            shortestDistance = distanceToMouse
+                            closestTarget = head
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+-- ========================================================================
+-- FUNCIONALIDADES DA ABA FPS
+-- ========================================================================
+createToggleElement("FPS", "Aimbot", "Aimbot", function(enabled)
+    if _G.AimbotConnection then _G.AimbotConnection:Disconnect() end
+    if enabled then
+        local moveMouse = mousemoverel or (Input and Input.MoveMouseTo)
+        _G.AimbotConnection = RunService.RenderStepped:Connect(function()
+            if _G.FPS_Settings.Aimbot then
+                fovCircle.Visible = true ; fovCircle.Radius = _G.FPS_Settings.Aimbot_FOV_Radius ; fovCircle.Position = UserInputService:GetMouseLocation()
+            else
+                fovCircle.Visible = false
+            end
+            if _G.FPS_Settings.Aimbot and isAiming then
+                local targetHead = getClosestVisibleEnemy()
+                if targetHead then
+                    local screenPos, _ = Camera:WorldToViewportPoint(targetHead.Position)
+                    local mousePos = UserInputService:GetMouseLocation()
+                    if moveMouse then moveMouse((screenPos.X - mousePos.X) / 1.4, (screenPos.Y - mousePos.Y) / 1.4)
+                    else Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, targetHead.Position), 0.3) end
+                end
+            end
+        end)
+    else
+        fovCircle.Visible = false
+    end
+end)
+
+createSliderElement("FPS", "Aimbot_FOV_Radius", 50, 500, _G.FPS_Settings.Aimbot_FOV_Radius, "Aimbot FOV", "px")
+createSliderElement("FPS", "Aimbot_Max_Distance", 50, 2000, _G.FPS_Settings.Aimbot_Max_Distance, "Distância Máxima", " studs")
+
+local function refreshESP()
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and p.Character then
+            local hasHighlight = p.Character:FindFirstChild("MenuESP")
+            if _G.FPS_Settings.ESP then
+                local isTeammate = p.Team and LocalPlayer.Team and p.Team == LocalPlayer.Team
+                local targetColor = isTeammate and Color3.fromRGB(0, 240, 255) or Color3.fromRGB(255, 30, 30)
+                if not hasHighlight then
+                    local highlight = Instance.new("Highlight") ; highlight.Name = "MenuESP" ; highlight.FillColor = targetColor ; highlight.OutlineColor = Color3.fromRGB(255, 255, 255) ; highlight.FillTransparency = 0.4 ; highlight.Parent = p.Character
+                else
+                    hasHighlight.FillColor = targetColor
+                end
+            else
+                if hasHighlight then hasHighlight:Destroy() end
+            end
+        end
+    end
+end
+
+createToggleElement("FPS", "ESP", "ESP", function(enabled)
+    if _G.ESPConnection then _G.ESPConnection:Disconnect() end ; refreshESP()
+    if enabled then _G.ESPConnection = RunService.Heartbeat:Connect(refreshESP) end
+end)
+
+createToggleElement("FPS", "Triggerbot", "Triggerbot", function(enabled)
+    if _G.TriggerbotConnection then _G.TriggerbotConnection:Disconnect() end
+    if enabled then
+        _G.TriggerbotConnection = RunService.RenderStepped:Connect(function()
+            local mouseTarget = LocalPlayer:GetMouse().Target
+            if mouseTarget and mouseTarget.Parent then
+                local character = mouseTarget.Parent
+                local targetPlayer = Players:GetPlayerFromCharacter(character) or Players:GetPlayerFromCharacter(character.Parent)
+                if targetPlayer and targetPlayer ~= LocalPlayer and (not targetPlayer.Team or targetPlayer.Team ~= LocalPlayer.Team) then
+                    local humanoid = targetPlayer.Character and targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+                    if humanoid and humanoid.Health > 0 then
+                        if mouse1click then mouse1click() elseif mouse1press and mouse1release then mouse1press() task.wait() mouse1release() end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- ========================================================================
+-- FUNCIONALIDADES: ABA NATURAL DESASTRE
+-- ========================================================================
+createToggleElement("Natural Desastre", "ND_FlingDebris", "Fling Debris", function(enabled)
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    if enabled then
+        task.spawn(function()
+            while _G.FPS_Settings.ND_FlingDebris and LocalPlayer.Character and hrp do
+                local bAV = hrp:FindFirstChild("RylFling") or Instance.new("BodyAngularVelocity")
+                bAV.Name = "RylFling" ; bAV.MaxTorque = Vector3.new(math.huge, math.huge, math.huge) ; bAV.P = 200000 ; bAV.AngularVelocity = Vector3.new(0, 9999, 0) ; bAV.Parent = hrp
+                for _, part in ipairs(workspace:GetPartBoundsInRadius(hrp.Position, 25)) do
+                    if part.Anchored == false and not part:IsDescendantOf(LocalPlayer.Character) then part.Velocity = (part.Position - hrp.Position).Unit * 300 end
+                end
+                task.wait(0.05)
+            end
+        end)
+    else
+        local bAV = hrp:FindFirstChild("RylFling")
+        if bAV then bAV:Destroy() end
+    end
+end)
+
+createToggleElement("Natural Desastre", "ND_GodTower", "God Tower", function(enabled)
+    if _G.NDSafeConnection then _G.NDSafeConnection:Disconnect() end
+    if enabled then _G.NDSafeConnection = RunService.Heartbeat:Connect(function() if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-36, 180, 345) ; LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0) end end) end
+end)
+
+createToggleElement("Natural Desastre", "ND_AntiPush", "Anti Push", function(enabled)
+    if _G.NDAntiPushConnection then _G.NDAntiPushConnection:Disconnect() end
+    if enabled then _G.NDAntiPushConnection = RunService.Heartbeat:Connect(function() if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then local hrp = LocalPlayer.Character.HumanoidRootPart ; hrp.Velocity = Vector3.new(hrp.Velocity.X, math.clamp(hrp.Velocity.Y, -50, 50), hrp.Velocity.Z) ; for _, v in ipairs(LocalPlayer.Character:GetChildren()) do if v:IsA("BodyMover") and v.Name ~= "RylFling" then v:Destroy() end end end end) end
+end)
+
+createToggleElement("Natural Desastre", "ND_Predictor", "Disaster Predictor", function(enabled)
+    if _G.NDPredictConnection then _G.NDPredictConnection:Disconnect() end
+    if enabled then _G.NDPredictConnection = workspace.ChildAdded:Connect(function(child) local name = child.Name:lower() if name:find("cloud") or name:find("tornado") or name:find("meteor") or name:find("tsunami") or name:find("fire") then titleText.Text = "DESASTRE: " .. string.upper(child.Name) ; task.wait(6) ; titleText.Text = "RYL MENU v14.0" end end) end
+end)
+
+createToggleElement("Natural Desastre", "ND_NoVisuals", "No Visuals", function(enabled)
+    if enabled then task.spawn(function() while _G.FPS_Settings.ND_NoVisuals do for _, v in ipairs(workspace:GetDescendants()) do if v:IsA("ParticleEmitter") or v:IsA("Smoke") then if v.Name == "AcidRain" or v.Name == "Blizzard" or v.Parent.Name:lower():find("smoke") then v.Enabled = false end end end task.wait(2) end end) end
+end)
+
+-- ========================================================================
+-- FUNCIONALIDADES DA ABA ZARALHO (ATUALIZADAS COM A BASE CORRETA E FLING PRO)
+-- ========================================================================
+createButtonElement("Zaralho", "PANIC BUTTON", Color3.fromRGB(255, 60, 60), function()
+    if CoreGui:FindFirstChild("RYL_MENU") then CoreGui.RYL_MENU:Destroy() end
+    for _, conn in pairs({_G.AimbotConnection, _G.ESPConnection, _G.NDSafeConnection, _G.NDPredictConnection, _G.NDAntiPushConnection, _G.TriggerbotConnection, _G.FlyConnection, _G.GodModeConnection, _G.NoclipConnection, _G.ClickTPConnection, _G.FlingConnection, _G.AntiGrabConnection, _G.WeaponESPConnection}) do
+        if conn then conn:Disconnect() end
+    end
+    if _G.FOVCircle then _G.FOVCircle:Remove() end
+    for k, v in pairs(_G.FPS_Settings) do if type(v) == "boolean" then _G.FPS_Settings[k] = false end end
+    
+    local char = LocalPlayer.Character
+    if char then
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if hrp then 
+            hrp.AssemblyAngularVelocity = Vector3.new(0,0,0)
+            if hrp:FindFirstChild("ProfFling") then hrp.ProfFling:Destroy() end
+        end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = 16 ; hum.JumpPower = 50 ; hum.PlatformStand = false end
+    end
+end)
+
+-- God Mode (Break Hitbox - Transparência + Sem colisão lado Client)
+local originalTransparencies = {}
+createToggleElement("Zaralho", "GodMode", "God Mode (Break Hitbox / Invisível)", function(enabled)
+    if _G.GodModeConnection then _G.GodModeConnection:Disconnect() end
+    local char = LocalPlayer.Character
+    
+    if enabled then
+        _G.GodModeConnection = RunService.RenderStepped:Connect(function()
+            if LocalPlayer.Character then
+                for _, part in ipairs(LocalPlayer.Character:GetChildren()) do
+                    if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                        if not originalTransparencies[part] then originalTransparencies[part] = part.Transparency end
+                        part.Transparency = 1 
+                        part.CanCollide = false
+                        part.Massless = true
+                    end
+                end
+            end
+        end)
+    else
+        if char then
+            for part, trans in pairs(originalTransparencies) do
+                if part and part.Parent then 
+                    part.Transparency = trans 
+                    part.CanCollide = true
+                    part.Massless = false
+                end
+            end
+        end
+        originalTransparencies = {}
+    end
+end)
+
+createToggleElement("Zaralho", "Noclip", "Noclip", function(enabled)
+    if _G.NoclipConnection then _G.NoclipConnection:Disconnect() end
+    if enabled then _G.NoclipConnection = RunService.Stepped:Connect(function() local char = LocalPlayer.Character if char then for _, part in ipairs(char:GetDescendants()) do if part:IsA("BasePart") and part.CanCollide then part.CanCollide = false end end end end) end
+end)
+
+-- Anti-Arrest (Weld Breaker Otimizado)
+createToggleElement("Zaralho", "AntiGrab", "Anti Arrest (Weld Breaker)", function(enabled)
+    if _G.AntiGrabConnection then _G.AntiGrabConnection:Disconnect() end
+    if enabled then
+        _G.AntiGrabConnection = RunService.Heartbeat:Connect(function()
+            local char = LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            
+            if char and hum then
+                local foiAgarrado = false
+                
+                -- Verifica todas as partes do personagem procurando conexões externas
+                for _, obj in ipairs(char:GetDescendants()) do
+                    if obj:IsA("Weld") or obj:IsA("WeldConstraint") or obj:IsA("ManualWeld") then
+                        if obj.Part0 and obj.Part1 then
+                            -- Se a Part0 ou Part1 não for nossa, é alguém nos segurando/algemando
+                            if not obj.Part0:IsDescendantOf(char) or not obj.Part1:IsDescendantOf(char) then
+                                obj:Destroy()
+                                foiAgarrado = true
+                            end
+                        end
+                    end
+                end
+                
+                -- Se quebramos o agarrão, restaura a mobilidade caso o policial tenha dado stun
+                if foiAgarrado then
+                    hum.PlatformStand = false
+                    hum.Sit = false
+                    
+                    -- Previne que o script deles deixe sua velocidade no 0
+                    if hum.WalkSpeed < 16 then
+                        hum.WalkSpeed = _G.FPS_Settings.SpeedValue or 16
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+createToggleElement("Zaralho", "WeaponESP", "Weapon ESP (Flutuante)", function(enabled)
+    if _G.WeaponESPConnection then _G.WeaponESPConnection:Disconnect() end
+    if enabled then
+        _G.WeaponESPConnection = RunService.Heartbeat:Connect(function()
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("Head") then
+                    local head = p.Character.Head
+                    local tool = p.Character:FindFirstChildOfClass("Tool")
+                    local bgui = head:FindFirstChild("ZaralhoWpnESP")
+                    
+                    if _G.FPS_Settings.WeaponESP then
+                        if not bgui then
+                            bgui = Instance.new("BillboardGui")
+                            bgui.Name = "ZaralhoWpnESP"
+                            bgui.Size = UDim2.new(0, 150, 0, 40)
+                            bgui.StudsOffset = Vector3.new(0, 2, 0)
+                            bgui.AlwaysOnTop = true
+                            bgui.Parent = head
+                            
+                            local txt = Instance.new("TextLabel", bgui)
+                            txt.Name = "WpnText"
+                            txt.Size = UDim2.new(1, 0, 1, 0)
+                            txt.BackgroundTransparency = 1
+                            txt.TextColor3 = Color3.fromRGB(0, 255, 150)
+                            txt.TextStrokeTransparency = 0.2
+                            txt.Font = Enum.Font.GothamBold
+                            txt.TextSize = 13
+                        end
+                        if tool then
+                            bgui.WpnText.Text = "🔫 [" .. tool.Name .. "]"
+                        else
+                            bgui.WpnText.Text = ""
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p.Character and p.Character:FindFirstChild("Head") then
+                local bgui = p.Character.Head:FindFirstChild("ZaralhoWpnESP")
+                if bgui then bgui:Destroy() end
+            end
+        end
+    end
+end)
+
+createButtonElement("Zaralho", "Bypass Loja de Armas (Custom)", Color3.fromRGB(0, 255, 120), function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    
+    -- Como é RP Militar/Policial BR, adicionei armas e equipamentos comuns nesses mapas
+    local armas = {
+        "Glock", "FAL", "M4A1", "MP5", "Taser", "Algema", "Cassetete", 
+        "Escudo", "Remington", "M870", "AK-47", "Desert Eagle"
+    }
+    
+    print("--- Tentando bypassar a loja customizada... ---")
+    
+    for _, AKUMA in ipairs(armas) do
+        task.spawn(function()
+            -- TENTATIVA 1: O Alvo [4] da imagem (RemoteEvent - o mais provável de bugar)
+            pcall(function()
+                ReplicatedStorage.ComprarArma:FireServer(AKUMA)
+                -- Tenta também com valor negativo caso ele peça o preço
+                ReplicatedStorage.ComprarArma:FireServer(AKUMA, -999999) 
+            end)
+            
+            -- TENTATIVA 2: O Alvo [2] da imagem (RemoteFunction)
+            pcall(function()
+                ReplicatedStorage.Remotes.Functions["Loja de Armas"].Comprar:InvokeServer(AKUMA)
+            end)
+            
+            -- TENTATIVA 3: O Alvo [1] da imagem (RemoteFunction)
+            pcall(function()
+                ReplicatedStorage.Remotes.Functions["Loja de Armas"]["Comprar [EQUIPAMENTO]"]:InvokeServer(AKUMA)
+            end)
+        end)
+    end
+end)
+
+-- FLING PROFISSIONAL (FE DENSE FLING)
+local originalProps = {}
+createToggleElement("Zaralho", "Fling", "Fling Profissional (FE Dense Spin)", function(enabled)
+    if _G.FlingConnection then _G.FlingConnection:Disconnect() end
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    
+    if enabled and hrp then
+        -- Salva as propriedades físicas originais
+        if not originalProps[hrp] then originalProps[hrp] = hrp.CustomPhysicalProperties end
+        
+        -- Aplica peso máximo e remove fricção
+        hrp.CustomPhysicalProperties = PhysicalProperties.new(100, 0, 0, 0, 0)
+        
+        local bav = Instance.new("BodyAngularVelocity")
+        bav.Name = "ProfFling"
+        bav.MaxTorque = Vector3.new(0, math.huge, 0) -- Força o giro apenas no eixo Y (estabilidade)
+        bav.AngularVelocity = Vector3.new(0, 99999, 0) 
+        bav.Parent = hrp
+
+        _G.FlingConnection = RunService.Heartbeat:Connect(function()
+            local currentChar = LocalPlayer.Character
+            local currentHrp = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+            if currentHrp then
+                -- Clampa a velocidade Y pra VOCÊ não voar, absorvendo impacto
+                local vel = currentHrp.AssemblyLinearVelocity
+                currentHrp.AssemblyLinearVelocity = Vector3.new(vel.X, 0, vel.Z)
+                
+                -- Impede tropeços nos próprios membros ao girar
+                for _, part in ipairs(currentChar:GetChildren()) do
+                    if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if hrp then
+            local bav = hrp:FindFirstChild("ProfFling")
+            if bav then bav:Destroy() end
+            
+            -- Restaura as propriedades normais
+            if originalProps[hrp] then hrp.CustomPhysicalProperties = originalProps[hrp] end
+            
+            if LocalPlayer.Character then
+                for _, part in ipairs(LocalPlayer.Character:GetChildren()) do
+                    if part:IsA("BasePart") then part.CanCollide = true end
+                end
+            end
+        end
+    end
+end)
+
+createToggleElement("Zaralho", "ClickTP", "Click TP (Ctrl + Click)", function(enabled)
+    if _G.ClickTPConnection then _G.ClickTPConnection:Disconnect() end
+    if enabled then
+        local mouse = LocalPlayer:GetMouse()
+        _G.ClickTPConnection = mouse.Button1Down:Connect(function()
+            if _G.FPS_Settings.ClickTP and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0)) end
+            end
+        end)
+    end
+end)
+
+createSliderElement("Zaralho", "SpeedValue", 16, 250, _G.FPS_Settings.SpeedValue, "Speed", " studs")
+createSliderElement("Zaralho", "JumpValue", 50, 350, _G.FPS_Settings.JumpValue, "Jump", " studs")
+
+createToggleElement("Zaralho", "Fly", "Fly", function(enabled)
+    if _G.FlyConnection then _G.FlyConnection:Disconnect() end
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    
+    if _G.FlyTracks then
+        if _G.FlyTracks.Idle then _G.FlyTracks.Idle:Stop() end
+        if _G.FlyTracks.Move then _G.FlyTracks.Move:Stop() end
+    end
+
+    if not enabled then
+        if hum then hum.PlatformStand = false ; hum:ChangeState(Enum.HumanoidStateType.GettingUp) end
+        if hrp then
+            if hrp:FindFirstChild("RylFlyVelocity") then hrp.RylFlyVelocity:Destroy() end
+            if hrp:FindFirstChild("RylFlyGyro") then hrp.RylFlyGyro:Destroy() end
+        end
+        return
+    end
+    
+    if not hrp or not hum then return end
+    local animator = hum:FindFirstChildOfClass("Animator") or Instance.new("Animator", hum)
+    local animIdle = Instance.new("Animation") ; animIdle.AnimationId = "rbxassetid://3137885375"
+    local animMove = Instance.new("Animation") ; animMove.AnimationId = "rbxassetid://3016661784"
+    _G.FlyTracks = { Idle = animator:LoadAnimation(animIdle), Move = animator:LoadAnimation(animMove) }
+    _G.FlyTracks.Idle.Priority = Enum.AnimationPriority.Action
+    _G.FlyTracks.Move.Priority = Enum.AnimationPriority.Action4
+
+    local bv = hrp:FindFirstChild("RylFlyVelocity") or Instance.new("BodyVelocity")
+    bv.Name = "RylFlyVelocity" ; bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge) ; bv.Velocity = Vector3.new(0, 0, 0) ; bv.Parent = hrp
+    local bg = hrp:FindFirstChild("RylFlyGyro") or Instance.new("BodyGyro")
+    bg.Name = "RylFlyGyro" ; bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge) ; bg.CFrame = hrp.CFrame ; bg.Parent = hrp
+    
+    _G.FlyConnection = RunService.RenderStepped:Connect(function()
+        local currentChar = LocalPlayer.Character
+        local currentHrp = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+        local currentHum = currentChar and currentChar:FindFirstChildOfClass("Humanoid")
+        if not currentHrp or not currentHum or not _G.FPS_Settings.Fly then return end
+        
+        currentHum.PlatformStand = true
+        local direction = Vector3.new(0, 0, 0)
+        local camCFrame = Camera.CFrame
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction = direction + camCFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction = direction - camCFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction = direction - camCFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction = direction + camCFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direction = direction + Vector3.new(0, 1, 0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direction = direction - Vector3.new(0, 1, 0) end
+        
+        local activeSpeed = _G.FPS_Settings.SpeedValue or 16
+        local isMoving = direction.Magnitude > 0
+        if isMoving then
+            bv.Velocity = direction.Unit * activeSpeed
+            if not _G.FlyTracks.Move.IsPlaying then _G.FlyTracks.Move:Play() end
+            if _G.FlyTracks.Idle.IsPlaying then _G.FlyTracks.Idle:Stop() end
+        else
+            bv.Velocity = Vector3.new(0, 0, 0)
+            if not _G.FlyTracks.Idle.IsPlaying then _G.FlyTracks.Idle:Play() end
+            if _G.FlyTracks.Move.IsPlaying then _G.FlyTracks.Move:Stop() end
+        end
+        bg.CFrame = camCFrame
+    end)
+end)
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            local char = LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            if hum and not _G.FPS_Settings.Fly then
+                hum.WalkSpeed = _G.FPS_Settings.SpeedValue or 16
+                hum.UseJumpPower = true
+                hum.JumpPower = _G.FPS_Settings.JumpValue or 50
+            end
+        end)
+        task.wait(0.1)
+    end
+end)
+
+for _, pageName in ipairs({"The Classic Soccer", "Tycoon"}) do
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, 0, 0, 40)
+    lbl.Text = " Aba de " .. pageName .. " aguardando desenvolvimento..."
+    lbl.TextColor3 = Color3.fromRGB(100, 100, 100)
+    lbl.BackgroundTransparency = 1
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 13
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = pages[pageName]
+end
+
+-- ======================= ARRASTE DA JANELA =======================
+local dragging, dragStart, startPos
+titleBar.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true ; dragStart = input.Position ; startPos = mainFrame.Position end end)
+titleBar.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Insert or input.KeyCode == Enum.KeyCode.F5 then mainFrame.Visible = not mainFrame.Visible end
+end)
+
+spawn(function()
+    local startWhite = Color3.fromRGB(255, 255, 255)
+    local endYellow = Color3.fromRGB(255, 220, 0)
+    local startBorder = Color3.fromRGB(160, 30, 30)
+    local endBorder = Color3.fromRGB(255, 200, 0)
+    local t = 0
+    while titleText and titleText.Parent do
+        t = t + 0.06
+        local fator = (math.sin(t) + 1) / 2
+        titleText.TextColor3 = startWhite:Lerp(endYellow, fator)
+        uiStroke.Color = startBorder:Lerp(endBorder, fator)
+        wait(0.05)
+    end
+end)
+
+pages["FPS"].Visible = true
+tabButtons[1].BackgroundColor3 = Color3.fromRGB(150, 25, 25)
+tabButtons[1].TextColor3 = Color3.fromRGB(255, 255, 255)
